@@ -90,11 +90,11 @@ class LFM2TransformerModelLoader:
         local_dir = os.path.join(lfm2_hf_models_dir, model_id.split('/')[-1])
         print(f"LFM2 HF: Downloading model: {model_id} to {local_dir}")
         try:
-            # snapshot_download(
-            #     repo_id=model_id,
-            #     local_dir=local_dir,
-            #     local_dir_use_symlinks=False
-            # )
+            snapshot_download(
+                repo_id=model_id,
+                local_dir=local_dir,
+                local_dir_use_symlinks=False
+            )
             print(
                 f"LFM2 HF: Successfully downloaded {model_id} to {local_dir}")
             return local_dir

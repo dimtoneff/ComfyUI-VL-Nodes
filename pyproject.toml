@@ -1,7 +1,7 @@
 [project]
 name = "comfyui-vl-nodes"
 description = "A collection of custom nodes for ComfyUI that integrates various Vision-Language (VL) models, including Xiaomi MiMo-VL, LiquidAI LFM2-VL, AIDC-AI Ovis2.5 and Ovis-U1. Tested with models: AIDC-AI/Ovis2.5-2B, AIDC-AI/Ovis2.5-9B, MiMo-VL-7B-RL-GGUF, LiquidAI/LFM2-VL-450M, LiquidAI/LFM2-VL-1.6B, AIDC-AI/Ovis-U1-3B."
-version = "0.3"
+version = "0.4"
 license = { file = "LICENSE" }
 dependencies = [
     "torch",
