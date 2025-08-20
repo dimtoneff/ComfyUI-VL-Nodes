@@ -1,12 +1,8 @@
 # ComfyUI-VL-Nodes
 
-This repository provides a collection of custom nodes for ComfyUI that integrate various Vision-Language (VL) models. These nodes allow you to perform tasks like image captioning, visual question answering (VQA), and generating detailed image descriptions directly within your ComfyUI workflows. This is particularly useful for creating rich prompts for text-to-image models. These nodes were for my own usage and experimentation but I decided to share them with the community. Feel free to fork this repo and expand the suport for VL models.
+This repository provides a collection of custom nodes for ComfyUI that integrate various Vision-Language (VL) models. These nodes allow you to perform tasks like image captioning, visual question answering (VQA), and generating detailed image descriptions directly within your ComfyUI workflows. **Strictly image2text workflows**. This is particularly useful for creating rich prompts for text-to-image models. These nodes were for my own usage and experimentation but I decided to share them with the community. Feel free to fork this repo and expand the support for more VL models.
 
 ![](./example_workflows/ovis2.5_workflow.JPG)
-
-![](./example_workflows/lfm2_workflow.JPG)
-![](./example_workflows/mimo_workflow.JPG)
-![](./example_workflows/ovis_u1_workflow.JPG)
 
 ## Features
 
@@ -73,7 +69,7 @@ Each model type has its own requirements for model files.
 
 ### MiMo-VL (GGUF)
 
-* **Models**: You need the main GGUF model (e.g., `mimo-vl-7b-q4_k_m.gguf`) and the corresponding CLIP vision model (e.g., `mmproj-model-f16.gguf`). **IMPORTANT**: Rename the mmproj file to mmproj-mimo-etc-etc-etc.gguf. A good source is [unsloth/MiMo-VL-7B-RL-GGUF](https://huggingface.co/unsloth/MiMo-VL-7B-RL-GGUF).
+* **Models**: You need the main GGUF model (e.g., `mimo-vl-7b-q4_k_m.gguf`) and the corresponding CLIP vision model (e.g., `mmproj-model-f16.gguf`). **IMPORTANT**: Rename the mmproj file to `mmproj-mimo`-etc-etc-etc.gguf. A good source is [unsloth/MiMo-VL-7B-RL-GGUF](https://huggingface.co/unsloth/MiMo-VL-7B-RL-GGUF).
 *   **Location**: Place both files in the same directory. You can use `ComfyUI/models/unet` for the main model and `ComfyUI/models/clip` for the vision model, or use a shared directory.
 *   **Example `extra_model_paths.yaml`**:
     ```yaml
@@ -101,7 +97,7 @@ Each model type has its own requirements for model files.
 
 ## Usage
 
-Once installed, you will find the nodes under the `MiMo`, `LFM2-VL`, and `Ovis-U1` categories.
+Once installed, you will find the nodes under the `MiMo`, `LFM2-VL`, `Ovis2.5` and `Ovis-U1` categories. Or double left click on empty space and search for the model name to see the nodes.
 
 ### MiMo Nodes
 
@@ -138,3 +134,9 @@ Once installed, you will find the nodes under the `MiMo`, `LFM2-VL`, and `Ovis-U
 ## Special Thanks and Links
 
 <a href="https://www.flaticon.com/free-icons/visual" title="visual icons">Visual icons created by Freepik - Flaticon</a>
+
+## Other examples
+
+![](./example_workflows/lfm2_workflow.JPG)
+![](./example_workflows/mimo_workflow.JPG)
+![](./example_workflows/ovis_u1_workflow.JPG)
