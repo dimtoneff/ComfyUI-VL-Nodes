@@ -9,7 +9,7 @@ from huggingface_hub import snapshot_download
 from torch.amp.autocast_mode import autocast
 import comfy.model_management
 import folder_paths
-from .utils import tensor2pil, resize_pil_image
+from .utils import tensor2pil, resize_pil_image, find_local_unet_models
 
 # Create a directory for Ovis-U1 models
 ovis_u1_dir = os.path.join(
@@ -47,22 +47,7 @@ class OvisU1ModelLoader:
 
     @classmethod
     def INPUT_TYPES(cls):
-        try:
-            # The user stated models are in the 'unet' folder.
-            ovis_u1_base_dir = folder_paths.get_folder_paths("unet")[0]
-            local_models = []
-            if os.path.isdir(ovis_u1_base_dir):
-                for item in os.listdir(ovis_u1_base_dir):
-                    item_path = os.path.join(ovis_u1_base_dir, item)
-                    # A directory containing 'config.json' is a Hugging Face model.
-                    # We'll filter for names containing 'ovis' to be specific.
-                    if os.path.isdir(item_path) and 'ovis' in item.lower() and os.path.exists(os.path.join(item_path, "config.json")):
-                        local_models.append(item)
-        except Exception as e:
-            print(
-                f"OvisU1-Loader: Could not scan for local models in unet folder: {e}")
-            local_models = []
-
+        local_models, _ = find_local_unet_models("ovis-u1")
         # Always include the option to download the base model from Hugging Face.
         hf_model_id = "AIDC-AI/Ovis-U1-3B"
         all_model_options = sorted(list(set(local_models + [hf_model_id])))
@@ -70,8 +55,6 @@ class OvisU1ModelLoader:
         default_model = hf_model_id
         if "Ovis-U1-3B-4bit" in all_model_options:
             default_model = "Ovis-U1-3B-4bit"
-        elif "Ovis-U1-3B" in all_model_options and "Ovis-U1-3B" != hf_model_id:
-            default_model = "Ovis-U1-3B"
 
         return {
             "required": {
@@ -86,7 +69,7 @@ class OvisU1ModelLoader:
     RETURN_TYPES = ("OVIS_U1_MODEL",)
     RETURN_NAMES = ("model",)
     FUNCTION = "load_model"
-    CATEGORY = "Ovis-U1"
+    CATEGORY = "VL-Nodes/Ovis-U1"
 
     def unload(self):
         """Unloads the Ovis-U1 model and releases associated resources."""
@@ -127,7 +110,7 @@ class OvisU1ModelLoader:
         else:
             try:
                 # For regular models, move to CPU to ensure VRAM is released before deleting
-                self.model.to('cpu')
+                self.model.to(device='cpu')
             except Exception as e:
                 print(f"Ovis-U1: Warning - could not move model to CPU: {e}")
 
@@ -159,12 +142,6 @@ class OvisU1ModelLoader:
             print(f"Error downloading model: {str(e)}")
             raise RuntimeError(
                 f"Failed to download model {model_name}. Error: {str(e)}")
-
-    def check_model_files(self, model_name):
-        """Check if the model files already exist locally."""
-        local_dir = os.path.join(ovis_u1_dir, model_name.split('/')[-1])
-        config_path = os.path.join(local_dir, "config.json")
-        return os.path.exists(config_path), local_dir
 
     def load_model(self, model_name, quantization, precision, device, auto_download):
         current_params = {
@@ -220,28 +197,34 @@ class OvisU1ModelLoader:
             dtype = torch.float32
 
         is_repo_id = '/' in model_name
-        local_folder_name = model_name.split('/')[-1]
-        local_dir = os.path.join(ovis_u1_dir, local_folder_name)
-        model_exists = os.path.exists(os.path.join(local_dir, "config.json"))
+        model_path_to_load = None
 
-        if is_repo_id and not model_exists and auto_download == "enable":
-            print(
-                f"OvisU1: Local model not found. Downloading from Hugging Face repo: {model_name}")
-            self.download_model(model_name)
-            model_exists = os.path.exists(
-                os.path.join(local_dir, "config.json"))
+        # Determine the name to search for locally.
+        search_name = model_name.split('/')[-1]
 
-        if model_exists:
-            model_path_to_load = local_dir
+        # Use the utility to find all local models and their paths.
+        local_models, local_model_paths = find_local_unet_models("ovis-u1")
+        path_map = {name: path for name, path in zip(
+            local_models, local_model_paths)}
+
+        if search_name in path_map:
+            model_path_to_load = path_map[search_name]
             print(f"OvisU1: Found local model at: {model_path_to_load}")
-        elif is_repo_id:
-            model_path_to_load = model_name
-            print(
-                f"OvisU1: Will attempt to load from Hugging Face repo: {model_path_to_load}")
-        else:
-            raise FileNotFoundError(
-                f"Local Ovis-U1 model folder not found: {local_dir}")
 
+        # If not found locally and it's a repo_id, handle download or direct HF loading.
+        if model_path_to_load is None and is_repo_id:
+            if auto_download == "enable":
+                print(
+                    f"OvisU1: Local model not found. Downloading from Hugging Face repo: {model_name}")
+                model_path_to_load = self.download_model(model_name)
+            else:
+                model_path_to_load = model_name
+                print(
+                    f"OvisU1: Will attempt to load from Hugging Face repo: {model_path_to_load}")
+
+        if model_path_to_load is None:
+            raise FileNotFoundError(
+                f"Ovis-U1 model '{model_name}' not found in any of the 'unet' directories: {folder_paths.get_folder_paths('unet')}")
         try:
             load_kwargs = {
                 "torch_dtype": dtype,
@@ -324,7 +307,7 @@ class OvisU1ImageCaption:
     RETURN_TYPES = ("STRING",)
     RETURN_NAMES = ("string",)
     FUNCTION = "generate_caption"
-    CATEGORY = "Ovis-U1"
+    CATEGORY = "VL-Nodes/Ovis-U1"
 
     def generate_caption(self, model, image, resize_image, prompt, max_new_tokens, temperature, top_p, do_sample):
         model_data = model

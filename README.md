@@ -2,6 +2,8 @@
 
 This repository provides a collection of custom nodes for ComfyUI that integrate various Vision-Language (VL) models. These nodes allow you to perform tasks like image captioning, visual question answering (VQA), and generating detailed image descriptions directly within your ComfyUI workflows. This is particularly useful for creating rich prompts for text-to-image models. These nodes were for my own usage and experimentation but I decided to share them with the community. Feel free to fork this repo and expand the suport for VL models.
 
+![](./example_workflows/ovis2.5_workflow.JPG)
+
 ![](./example_workflows/lfm2_workflow.JPG)
 ![](./example_workflows/mimo_workflow.JPG)
 ![](./example_workflows/ovis_u1_workflow.JPG)
@@ -13,6 +15,7 @@ This project includes nodes for the following models:
 * **Xiaomi MiMo-VL GGUF only**: Utilizes GGUF models for efficient image-to-text generation (MiMo-VL-7B-RL-GGUF).
 * **LiquidAI LFM2-VL transformers only**: Supports Hugging Face transformer models for image-to-text tasks (LiquidAI/LFM2-VL-450M, LiquidAI/LFM2-VL-1.6B).
 * **AIDC-AI Ovis-U1 transformers only**: Provides nodes for the Ovis-U1 model for image captioning (AIDC-AI/Ovis-U1-3B).
+* **AIDC-AI Ovis-2.5 transformers only**: Adds support for the Ovis-2.5 model series (AIDC-AI/Ovis2.5-2B, AIDC-AI/Ovis2.5-9B).
 * **General Utilities**: Includes a `Free Memory` node to help manage VRAM by unloading all loaded VL models.
 
 ## Installation
@@ -70,7 +73,7 @@ Each model type has its own requirements for model files.
 
 ### MiMo-VL (GGUF)
 
-*   **Models**: You need the main GGUF model (e.g., `mimo-vl-7b-q4_k_m.gguf`) and the corresponding CLIP vision model (e.g., `mmproj-model-f16.gguf`). A good source is [unsloth/MiMo-VL-7B-RL-GGUF](https://huggingface.co/unsloth/MiMo-VL-7B-RL-GGUF).
+* **Models**: You need the main GGUF model (e.g., `mimo-vl-7b-q4_k_m.gguf`) and the corresponding CLIP vision model (e.g., `mmproj-model-f16.gguf`). **IMPORTANT**: Rename the mmproj file to mmproj-mimo-etc-etc-etc.gguf. A good source is [unsloth/MiMo-VL-7B-RL-GGUF](https://huggingface.co/unsloth/MiMo-VL-7B-RL-GGUF).
 *   **Location**: Place both files in the same directory. You can use `ComfyUI/models/unet` for the main model and `ComfyUI/models/clip` for the vision model, or use a shared directory.
 *   **Example `extra_model_paths.yaml`**:
     ```yaml
@@ -90,6 +93,12 @@ Each model type has its own requirements for model files.
 *   **Models**: These can be downloaded automatically from the Hugging Face Hub.
 *   **Location**: They will be saved to a subdirectory inside `ComfyUI/models/unet`.
 
+### Ovis-2.5 (Hugging Face)
+
+*   **Models**: These can be downloaded automatically from the Hugging Face Hub.
+*   **Location**: They will be saved to a subdirectory inside `ComfyUI/models/unet`.
+
+
 ## Usage
 
 Once installed, you will find the nodes under the `MiMo`, `LFM2-VL`, and `Ovis-U1` categories.
@@ -108,6 +117,12 @@ Once installed, you will find the nodes under the `MiMo`, `LFM2-VL`, and `Ovis-U
 
 *   **`Load Ovis-U1 Model`**: Loads Ovis-U1 models from Hugging Face.
 *   **`Ovis-U1 Image Caption`**: Generates a caption for an image.
+
+### Ovis-2.5 Nodes
+
+*   **`Load Ovis-2.5 Model`**: Loads Ovis-2.5 models from Hugging Face.
+*   **`Ovis-2.5 Image to Text`**: Generates text from an image using the loaded model, with optional "thinking" output.
+
 
 ### Memory Node
 

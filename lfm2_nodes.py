@@ -4,9 +4,9 @@ import torch
 from huggingface_hub import snapshot_download
 from transformers import AutoModelForImageTextToText, AutoProcessor
 from transformers.utils.quantization_config import BitsAndBytesConfig
-from torch.amp.autocast_mode import autocast
 import folder_paths
-from .utils import tensor2pil
+from torch.amp.autocast_mode import autocast
+from .utils import tensor2pil, find_local_unet_models
 
 # Global registry for LFM2 loaders
 # _lfm2_gguf_loader_instances = []
@@ -69,7 +69,7 @@ class LFM2TransformerModelLoader:
     RETURN_TYPES = ("LFM2_HF_MODEL",)
     RETURN_NAMES = ("lfm2_hf_model",)
     FUNCTION = "load_model"
-    CATEGORY = "LFM2-VL"
+    CATEGORY = "VL-Nodes/LFM2-VL"
 
     def unload(self):
         if self.model is None:
@@ -83,6 +83,25 @@ class LFM2TransformerModelLoader:
         gc.collect()
         if torch.cuda.is_available():
             torch.cuda.empty_cache()
+
+    def download_model(self, model_id):
+        """Download the model from Hugging Face."""
+        # The download directory is defined at the module level
+        local_dir = os.path.join(lfm2_hf_models_dir, model_id.split('/')[-1])
+        print(f"LFM2 HF: Downloading model: {model_id} to {local_dir}")
+        try:
+            # snapshot_download(
+            #     repo_id=model_id,
+            #     local_dir=local_dir,
+            #     local_dir_use_symlinks=False
+            # )
+            print(
+                f"LFM2 HF: Successfully downloaded {model_id} to {local_dir}")
+            return local_dir
+        except Exception as e:
+            print(f"LFM2 HF: Error downloading model: {str(e)}")
+            raise RuntimeError(
+                f"Failed to download model {model_id}. Error: {str(e)}")
 
     def load_model(self, model_id, quantization, precision, device, auto_download):
         current_params = {
@@ -108,18 +127,36 @@ class LFM2TransformerModelLoader:
         else:
             dtype = torch.float32
 
-        local_dir = os.path.join(lfm2_hf_models_dir, model_id.split('/')[-1])
-        model_exists = os.path.exists(os.path.join(local_dir, "config.json"))
+        model_path_to_load = None
+        is_repo_id = '/' in model_id
 
-        if not model_exists and auto_download == "enable":
-            print(
-                f"LFM2 HF: Local model not found. Downloading from Hugging Face repo: {model_id}")
-            snapshot_download(
-                repo_id=model_id, local_dir=local_dir, local_dir_use_symlinks=False)
-            model_exists = True
+        # Determine the name to search for locally.
+        search_name = model_id.split('/')[-1]
 
-        model_path_to_load = local_dir if model_exists else model_id
+        # Use the utility to find all local models and their paths.
+        local_models, local_model_paths = find_local_unet_models("lfm2")
+        print(
+            f"LFM2 HF: Found local models: {local_models}, {local_model_paths}")
+        path_map = {name: path for name, path in zip(
+            local_models, local_model_paths)}
 
+        if search_name in path_map:
+            model_path_to_load = path_map[search_name]
+            print(f"LFM2 HF: Found local model at: {model_path_to_load}")
+
+        # If not found locally and it's a repo_id, handle download or direct HF loading.
+        if model_path_to_load is None and is_repo_id:
+            if auto_download == "enable":
+                print(
+                    f"LFM2 HF: Local model not found. Downloading from Hugging Face repo: {model_id}")
+                model_path_to_load = self.download_model(model_id)
+            else:
+                model_path_to_load = model_id
+                print(
+                    f"LFM2 HF: Will attempt to load from Hugging Face repo: {model_path_to_load}")
+        if model_path_to_load is None:
+            raise FileNotFoundError(
+                f"LFM2-VL model '{model_id}' not found in any of the 'unet' directories: {folder_paths.get_folder_paths('unet')}")
         try:
             load_kwargs = {
                 "torch_dtype": dtype,
@@ -171,7 +208,7 @@ class LFM2TransformerImageToText:
     RETURN_TYPES = ("STRING",)
     RETURN_NAMES = ("text",)
     FUNCTION = "generate_text"
-    CATEGORY = "LFM2-VL"
+    CATEGORY = "VL-Nodes/LFM2-VL"
 
     def generate_text(self, lfm2_hf_model, image, prompt, max_new_tokens, temperature, min_p, repetition_penalty):
         model = lfm2_hf_model["model"]
@@ -294,7 +331,7 @@ class LFM2TransformerImageToText:
 #     RETURN_TYPES = ("LFM2_GGUF_MODEL",)
 #     RETURN_NAMES = ("lfm2_gguf_model",)
 #     FUNCTION = "load_model"
-#     CATEGORY = "LFM2-VL"
+#     CATEGORY = "VL-Nodes/LFM2-VL"
 
 #     def unload(self):
 #         if self.llm is None and self.chat_handler is None:
@@ -406,7 +443,7 @@ class LFM2TransformerImageToText:
 #     RETURN_TYPES = ("STRING",)
 #     RETURN_NAMES = ("text",)
 #     FUNCTION = "generate_text"
-#     CATEGORY = "LFM2-VL"
+#     CATEGORY = "VL-Nodes/LFM2-VL"
 
 #     def generate_text(self, lfm2_gguf_model, image, system_prompt, prompt, max_tokens, temperature, min_p, repetition_penalty):
 #         llm = lfm2_gguf_model["llm"]

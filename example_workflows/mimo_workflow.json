@@ -1,8 +1,8 @@
 {
   "id": "9e07843c-8f59-4563-8826-12739285ffca",
   "revision": 0,
-  "last_node_id": 32,
-  "last_link_id": 52,
+  "last_node_id": 33,
+  "last_link_id": 55,
   "nodes": [
     {
       "id": 14,
@@ -44,45 +44,6 @@
       ]
     },
     {
-      "id": 13,
-      "type": "ShowText|pysssss",
-      "pos": [
-        739.6253662109375,
-        153.13951110839844
-      ],
-      "size": [
-        249.3433074951172,
-        191.04640197753906
-      ],
-      "flags": {},
-      "order": 5,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "text",
-          "type": "STRING",
-          "link": 50
-        }
-      ],
-      "outputs": [
-        {
-          "name": "STRING",
-          "shape": 6,
-          "type": "STRING",
-          "links": null
-        }
-      ],
-      "title": "PROMPT",
-      "properties": {
-        "cnr_id": "comfyui-custom-scripts",
-        "ver": "aac13aa7ce35b07d43633c3bbe654a38c00d74f5",
-        "Node name for S&R": "ShowText|pysssss"
-      },
-      "widgets_values": [
-        "Two people standing on rocks by a calm body of water at sunset, warm golden light, two boats on water (one with a person, one small), distant mountains, orange sky, silhouettes, serene atmosphere"
-      ]
-    },
-    {
       "id": 31,
       "type": "MiMoImageToText",
       "pos": [
@@ -113,7 +74,7 @@
           "name": "Prompt",
           "type": "STRING",
           "links": [
-            49
+            54
           ]
         },
         {
@@ -125,9 +86,10 @@
         }
       ],
       "properties": {
-        "aux_id": "dimtoneff/ComfyUI-VL-Nodes",
+        "cnr_id": "comfyui-vl-nodes",
         "ver": "8e0e876a96488dabe86f09d3696364ef74d1b52e",
-        "Node name for S&R": "MiMoImageToText"
+        "Node name for S&R": "MiMoImageToText",
+        "aux_id": "dimtoneff/ComfyUI-VL-Nodes"
       },
       "widgets_values": [
         true,
@@ -178,42 +140,6 @@
       ]
     },
     {
-      "id": 32,
-      "type": "MiMoFreeMemoryAPI",
-      "pos": [
-        780.7821044921875,
-        386.2331848144531
-      ],
-      "size": [
-        197.83065795898438,
-        26
-      ],
-      "flags": {},
-      "order": 3,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "anything",
-          "type": "*",
-          "link": 49
-        }
-      ],
-      "outputs": [
-        {
-          "name": "output",
-          "type": "*",
-          "links": [
-            50
-          ]
-        }
-      ],
-      "properties": {
-        "aux_id": "dimtoneff/ComfyUI-VL-Nodes",
-        "ver": "8e0e876a96488dabe86f09d3696364ef74d1b52e",
-        "Node name for S&R": "MiMoFreeMemoryAPI"
-      }
-    },
-    {
       "id": 30,
       "type": "MiMoModelLoader",
       "pos": [
@@ -238,9 +164,10 @@
         }
       ],
       "properties": {
-        "aux_id": "dimtoneff/ComfyUI-VL-Nodes",
+        "cnr_id": "comfyui-vl-nodes",
         "ver": "8e0e876a96488dabe86f09d3696364ef74d1b52e",
-        "Node name for S&R": "MiMoModelLoader"
+        "Node name for S&R": "MiMoModelLoader",
+        "aux_id": "dimtoneff/ComfyUI-VL-Nodes"
       },
       "widgets_values": [
         "MiMo-VL-7B-RL-UD-Q6_K_XL.gguf",
@@ -250,6 +177,84 @@
         "cuda",
         "disable"
       ]
+    },
+    {
+      "id": 13,
+      "type": "ShowText|pysssss",
+      "pos": [
+        739.6253662109375,
+        153.13951110839844
+      ],
+      "size": [
+        249.3433074951172,
+        191.04640197753906
+      ],
+      "flags": {},
+      "order": 5,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "text",
+          "type": "STRING",
+          "link": 55
+        }
+      ],
+      "outputs": [
+        {
+          "name": "STRING",
+          "shape": 6,
+          "type": "STRING",
+          "links": null
+        }
+      ],
+      "title": "PROMPT",
+      "properties": {
+        "cnr_id": "comfyui-custom-scripts",
+        "ver": "aac13aa7ce35b07d43633c3bbe654a38c00d74f5",
+        "Node name for S&R": "ShowText|pysssss"
+      },
+      "widgets_values": [
+        "Two people standing on rocks by a calm body of water at sunset, warm golden light, two boats on water (one with a person, one small), distant mountains, orange sky, silhouettes, serene atmosphere"
+      ]
+    },
+    {
+      "id": 33,
+      "type": "MiMoFreeMemoryAPI",
+      "pos": [
+        785.6914672851562,
+        431.0513000488281
+      ],
+      "size": [
+        243.55372619628906,
+        58
+      ],
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "anything",
+          "type": "*",
+          "link": 54
+        }
+      ],
+      "outputs": [
+        {
+          "name": "output",
+          "type": "*",
+          "links": [
+            55
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfyui-vl-nodes",
+        "ver": "6ab7af32e11476b93ee4c8f99488c3f648c838b0",
+        "Node name for S&R": "MiMoFreeMemoryAPI"
+      },
+      "widgets_values": [
+        false
+      ]
     }
   ],
   "links": [
@@ -258,22 +263,6 @@
       31,
       1,
       14,
-      0,
-      "STRING"
-    ],
-    [
-      49,
-      31,
-      0,
-      32,
-      0,
-      "*"
-    ],
-    [
-      50,
-      32,
-      0,
-      13,
       0,
       "STRING"
     ],
@@ -292,16 +281,32 @@
       31,
       1,
       "IMAGE"
+    ],
+    [
+      54,
+      31,
+      0,
+      33,
+      0,
+      "*"
+    ],
+    [
+      55,
+      33,
+      0,
+      13,
+      0,
+      "STRING"
     ]
   ],
   "groups": [],
   "config": {},
   "extra": {
     "ds": {
-      "scale": 1.4641000000000008,
+      "scale": 1.2100000000000006,
       "offset": [
-        -39.3025121608109,
-        136.81843557994117
+        96.95315104792218,
+        89.44462231581996
       ]
     },
     "frontendVersion": "1.25.9",

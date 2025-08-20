@@ -1,8 +1,8 @@
 {
   "id": "bb0099a8-b11a-4af6-a46b-a00220b1ae5d",
   "revision": 0,
-  "last_node_id": 5,
-  "last_link_id": 5,
+  "last_node_id": 6,
+  "last_link_id": 8,
   "nodes": [
     {
       "id": 3,
@@ -74,14 +74,15 @@
           "name": "string",
           "type": "STRING",
           "links": [
-            4
+            7
           ]
         }
       ],
       "properties": {
-        "aux_id": "dimtoneff/ComfyUI-VL-Nodes",
+        "cnr_id": "comfyui-vl-nodes",
         "ver": "8e0e876a96488dabe86f09d3696364ef74d1b52e",
-        "Node name for S&R": "OvisU1ImageCaption"
+        "Node name for S&R": "OvisU1ImageCaption",
+        "aux_id": "dimtoneff/ComfyUI-VL-Nodes"
       },
       "widgets_values": [
         true,
@@ -110,7 +111,7 @@
         {
           "name": "text",
           "type": "STRING",
-          "link": 5
+          "link": 8
         }
       ],
       "outputs": [
@@ -127,19 +128,19 @@
         "Node name for S&R": "ShowText|pysssss"
       },
       "widgets_values": [
-        "A serene sunset scene by the sea, with two silhouetted figures standing on rocks, gazing at the water. The sky is a warm golden hue, reflecting on the calm ocean. In the distance, two small boats with people are visible, adding a sense of tranquility and companionship. The horizon is lined with distant mountains, enhancing the peaceful atmosphere."
+        "A serene sunset scene by the water, featuring two silhouetted figures standing on rocks, gazing at the horizon. The sky is painted in warm hues of orange and yellow, reflecting on the calm water. In the distance, two small boats with people are visible, adding a sense of tranquility and companionship to the image. The silhouette of distant mountains completes the"
       ]
     },
     {
-      "id": 5,
+      "id": 6,
       "type": "MiMoFreeMemoryAPI",
       "pos": [
-        569.6000366210938,
-        255.4000244140625
+        530.4000244140625,
+        218.60006713867188
       ],
       "size": [
-        197.83065795898438,
-        26
+        270,
+        58
       ],
       "flags": {},
       "order": 3,
@@ -148,7 +149,7 @@
         {
           "name": "anything",
           "type": "*",
-          "link": 4
+          "link": 7
         }
       ],
       "outputs": [
@@ -156,16 +157,18 @@
           "name": "output",
           "type": "*",
           "links": [
-            5
+            8
           ]
         }
       ],
       "properties": {
-        "aux_id": "dimtoneff/ComfyUI-VL-Nodes",
-        "ver": "8e0e876a96488dabe86f09d3696364ef74d1b52e",
+        "cnr_id": "comfyui-vl-nodes",
+        "ver": "6ab7af32e11476b93ee4c8f99488c3f648c838b0",
         "Node name for S&R": "MiMoFreeMemoryAPI"
       },
-      "widgets_values": []
+      "widgets_values": [
+        false
+      ]
     },
     {
       "id": 2,
@@ -192,9 +195,10 @@
         }
       ],
       "properties": {
-        "aux_id": "dimtoneff/ComfyUI-VL-Nodes",
+        "cnr_id": "comfyui-vl-nodes",
         "ver": "8e0e876a96488dabe86f09d3696364ef74d1b52e",
-        "Node name for S&R": "OvisU1ModelLoader"
+        "Node name for S&R": "OvisU1ModelLoader",
+        "aux_id": "dimtoneff/ComfyUI-VL-Nodes"
       },
       "widgets_values": [
         "AIDC-AI/Ovis-U1-3B",
@@ -223,16 +227,16 @@
       "IMAGE"
     ],
     [
-      4,
+      7,
       1,
       0,
-      5,
+      6,
       0,
       "*"
     ],
     [
-      5,
-      5,
+      8,
+      6,
       0,
       4,
       0,
@@ -245,8 +249,8 @@
     "ds": {
       "scale": 1,
       "offset": [
-        61.5999755859375,
-        0
+        169.5999755859375,
+        27.199996948242188
       ]
     },
     "frontendVersion": "1.25.9",

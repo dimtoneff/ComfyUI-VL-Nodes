@@ -1,0 +1,318 @@
+{
+  "id": "bb0099a8-b11a-4af6-a46b-a00220b1ae5d",
+  "revision": 0,
+  "last_node_id": 11,
+  "last_link_id": 13,
+  "nodes": [
+    {
+      "id": 4,
+      "type": "ShowText|pysssss",
+      "pos": [
+        468,
+        590.5999755859375
+      ],
+      "size": [
+        408.80010986328125,
+        592.3999633789062
+      ],
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "text",
+          "type": "STRING",
+          "link": 11
+        }
+      ],
+      "outputs": [
+        {
+          "name": "STRING",
+          "shape": 6,
+          "type": "STRING",
+          "links": null
+        }
+      ],
+      "title": "DESCRIPTION",
+      "properties": {
+        "cnr_id": "comfyui-custom-scripts",
+        "ver": "f2838ed5e59de4d73cde5c98354b87a8d3200190",
+        "Node name for S&R": "ShowText|pysssss"
+      },
+      "widgets_values": [
+        "This image captures a serene sunset scene over a calm body of water, likely a lake, with a backdrop of distant mountains.  \n\n### Foreground:  \nTwo silhouetted figures stand on rocky terrain, facing the water. Their dark outlines contrast sharply with the warm, golden light of the setting sun, emphasizing their presence against the luminous backdrop. The rocks beneath them are also dark, adding texture to the lower portion of the frame.  \n\n\n### Midground:  \nThe lake dominates the middle ground, its surface shimmering with the golden hues of the sunset. Two small boats float on the water:  \n- A boat closer to the foreground (left) has a single figure, likely rowing, with subtle ripples trailing behind it.  \n- A second boat, farther out (right), carries two figures, their forms also silhouetted against the glowing water. The gentle waves and reflections of the sun create a tranquil, almost dreamlike quality to the water.  \n\n\n### Background:  \nDistant mountains form a layered horizon, their dark silhouettes softened by the warm light of the sunset. The sky transitions from a deep golden near the horizon to a lighter, softer yellow higher up, blending seamlessly with the mountain outlines. The overall color palette—dominated by warm oranges, yellows, and dark shadows—conveys a peaceful, almost meditative mood.  \n\n\n### Atmosphere & Composition:  \nThe image balances natural elements (water, mountains, sky) with human presence (the two figures). The warm, diffused light of the sunset casts a golden glow over the entire scene, enhancing the sense of calm and timelessness. The composition draws the eye from the silhouetted figures in the foreground, across the shimmering lake, to the distant mountains, creating a harmonious flow. The scene evokes a feeling of quiet reflection, as if the two figures are taking in the beauty of the sunset and the surrounding landscape.  \n\n\nIn summary, this photograph masterfully captures the interplay of light, water, and human presence, resulting in a tranquil and visually striking depiction of a sunset over a lake."
+      ]
+    },
+    {
+      "id": 10,
+      "type": "Ovis25ModelLoader",
+      "pos": [
+        176,
+        253.800048828125
+      ],
+      "size": [
+        270,
+        130
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "ovis25_model",
+          "type": "OVIS25_MODEL",
+          "links": [
+            10
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfyui-vl-nodes",
+        "ver": "6ab7af32e11476b93ee4c8f99488c3f648c838b0",
+        "Node name for S&R": "Ovis25ModelLoader"
+      },
+      "widgets_values": [
+        "AIDC-AI/Ovis2.5-2B",
+        "bfloat16",
+        "cuda",
+        "enable"
+      ]
+    },
+    {
+      "id": 3,
+      "type": "LoadImage",
+      "pos": [
+        172,
+        425
+      ],
+      "size": [
+        274.080078125,
+        314.0000305175781
+      ],
+      "flags": {},
+      "order": 1,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            7
+          ]
+        },
+        {
+          "name": "MASK",
+          "type": "MASK",
+          "links": null
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.50",
+        "Node name for S&R": "LoadImage"
+      },
+      "widgets_values": [
+        "pexels-enesersahin-29529439.jpg",
+        "image"
+      ]
+    },
+    {
+      "id": 11,
+      "type": "MiMoFreeMemoryAPI",
+      "pos": [
+        899.1998901367188,
+        469.7999572753906
+      ],
+      "size": [
+        270,
+        58
+      ],
+      "flags": {},
+      "order": 4,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "anything",
+          "type": "*",
+          "link": 12
+        }
+      ],
+      "outputs": [
+        {
+          "name": "output",
+          "type": "*",
+          "links": [
+            13
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfyui-vl-nodes",
+        "ver": "6ab7af32e11476b93ee4c8f99488c3f648c838b0",
+        "Node name for S&R": "MiMoFreeMemoryAPI"
+      },
+      "widgets_values": [
+        false
+      ]
+    },
+    {
+      "id": 9,
+      "type": "ShowText|pysssss",
+      "pos": [
+        892,
+        589
+      ],
+      "size": [
+        285.60015869140625,
+        175.60015869140625
+      ],
+      "flags": {},
+      "order": 5,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "text",
+          "type": "STRING",
+          "link": 13
+        }
+      ],
+      "outputs": [
+        {
+          "name": "STRING",
+          "shape": 6,
+          "type": "STRING",
+          "links": null
+        }
+      ],
+      "title": "THINKING",
+      "properties": {
+        "cnr_id": "comfyui-custom-scripts",
+        "ver": "f2838ed5e59de4d73cde5c98354b87a8d3200190",
+        "Node name for S&R": "ShowText|pysssss"
+      },
+      "widgets_values": [
+        "用户现在需要详细描述这张图片。首先，观察整体场景：日落时分的湖面，色调暖黄，氛围宁静。然后分解元素：前景、中景、背景。\n\n前景：两个人站在岩石上，剪影，背对着镜头，面向湖面。他们的姿态是站立，可能在欣赏风景。岩石的轮廓在光线中显得暗，突出人物的剪影效果。\n\n中景：湖面上有两艘小船。左边的船靠近前景人物，船上有一个身影，可能是划船者。右边的船更远处，也有两个人，船的轮廓清晰，水面反射光线，波纹细腻。湖面的金色光泽，因为夕阳的光线，整个水面泛着暖色调，波纹自然，显示出平静但有微风的感觉。\n\n背景：远处的山脉，轮廓在夕阳下呈现深色剪影，层次分明，山脉的轮廓线柔和，和天空的渐变色（从橙黄到淡黄）衔接。天空的颜色是暖黄色，接近黄昏，光线柔和，没有强烈对比，营造出宁静的氛围。\n\n整体氛围：温暖、宁静，夕阳的金色调让整个画面充满诗意，人物的存在增加了人文气息，与自然景观和谐融合。光线的运用突出剪影和水面的反射，增强了视觉层次和情感表达。\n\n现在组织语言，从整体到局部，描述色调、元素、光影、氛围等。"
+      ]
+    },
+    {
+      "id": 8,
+      "type": "Ovis25ImageToText",
+      "pos": [
+        473.59991455078125,
+        253.79998779296875
+      ],
+      "size": [
+        400,
+        300
+      ],
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "ovis25_model",
+          "type": "OVIS25_MODEL",
+          "link": 10
+        },
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "link": 7
+        }
+      ],
+      "outputs": [
+        {
+          "name": "text",
+          "type": "STRING",
+          "links": [
+            11
+          ]
+        },
+        {
+          "name": "thinking",
+          "type": "STRING",
+          "links": [
+            12
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfyui-vl-nodes",
+        "ver": "6ab7af32e11476b93ee4c8f99488c3f648c838b0",
+        "Node name for S&R": "Ovis25ImageToText"
+      },
+      "widgets_values": [
+        "Describe this image in detail.",
+        true,
+        true,
+        true,
+        4096,
+        3072,
+        0.7,
+        0.9,
+        "false"
+      ]
+    }
+  ],
+  "links": [
+    [
+      7,
+      3,
+      0,
+      8,
+      1,
+      "IMAGE"
+    ],
+    [
+      10,
+      10,
+      0,
+      8,
+      0,
+      "OVIS25_MODEL"
+    ],
+    [
+      11,
+      8,
+      0,
+      4,
+      0,
+      "STRING"
+    ],
+    [
+      12,
+      8,
+      1,
+      11,
+      0,
+      "*"
+    ],
+    [
+      13,
+      11,
+      0,
+      9,
+      0,
+      "STRING"
+    ]
+  ],
+  "groups": [],
+  "config": {},
+  "extra": {
+    "ds": {
+      "scale": 1,
+      "offset": [
+        63.20002746582031,
+        -57.60003662109375
+      ]
+    },
+    "frontendVersion": "1.25.9",
+    "VHS_latentpreview": false,
+    "VHS_latentpreviewrate": 0,
+    "VHS_MetadataImage": true,
+    "VHS_KeepIntermediate": true
+  },
+  "version": 0.4
+}

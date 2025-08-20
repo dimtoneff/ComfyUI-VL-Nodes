@@ -64,7 +64,7 @@ class MiMoModelLoader:
     RETURN_TYPES = ("MIMO_MODEL",)
     RETURN_NAMES = ("mimo_model",)
     FUNCTION = "load_model"
-    CATEGORY = "MiMo"
+    CATEGORY = "VL-Nodes/MiMo"
 
     def unload(self):
         """Unloads the GGUF model and releases associated resources."""
@@ -184,7 +184,7 @@ class MiMoImageToText:
     RETURN_TYPES = ("STRING", "STRING")
     RETURN_NAMES = ("Prompt", "Thinking")
     FUNCTION = "generate_description"
-    CATEGORY = "MiMo"
+    CATEGORY = "VL-Nodes/MiMo"
 
     def generate_description(self, mimo_model, image, resize_image, system_prompt, prompt, max_tokens):
         pil_image = tensor2pil(image)
@@ -269,15 +269,15 @@ class MiMoImageToText:
         if not thinking_text:  # No error occurred
             prompt_text = description
             think_match = re.search(
-                r'<think>(.*?)</think>', description, re.DOTALL)
+                r'<think>(.*?)</think>', description if description is not None else "", re.DOTALL)
             if think_match:
                 thinking_text = think_match.group(1).strip()
-                prompt_text = description.replace(
+                prompt_text = (description or "").replace(
                     think_match.group(0), '').strip()
         else:  # Error occurred
             prompt_text = ""  # Return empty prompt text
 
-        return (prompt_text.strip('"'), thinking_text,)
+        return ((prompt_text or "").strip('"'), thinking_text,)
 
 
 NODE_CLASS_MAPPINGS = {

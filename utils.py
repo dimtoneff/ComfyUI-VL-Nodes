@@ -1,6 +1,5 @@
 
-import gc
-import torch
+import os
 import numpy as np
 from PIL import Image
 import logging
@@ -18,6 +17,7 @@ except ImportError:
     class Resampling:
         LANCZOS = Image.LANCZOS
 
+
 class AlwaysEqualProxy(str):
     def __eq__(self, _):
         return True
@@ -25,7 +25,9 @@ class AlwaysEqualProxy(str):
     def __ne__(self, _):
         return False
 
+
 any_type = AlwaysEqualProxy("*")
+
 
 def tensor2pil(image):
     if image.dim() == 4:
@@ -33,6 +35,7 @@ def tensor2pil(image):
     image = image.cpu().numpy()
     image = (image * 255).astype(np.uint8)
     return Image.fromarray(image)
+
 
 def resize_pil_image(pil_image, target_size=512, node_name="Node"):
     """Resizes a PIL image if its largest dimension exceeds the target size, maintaining aspect ratio."""
@@ -50,6 +53,7 @@ def resize_pil_image(pil_image, target_size=512, node_name="Node"):
             (new_w, new_h), Resampling.LANCZOS)
     return pil_image
 
+
 def update_folder_names_and_paths(key, targets=[]):
     # check for existing key
     base = folder_paths.folder_names_and_paths.get(key, ([], {}))
@@ -62,6 +66,39 @@ def update_folder_names_and_paths(key, targets=[]):
     if base and base != orig:
         logging.warning(
             f"Unknown file list already present on key {key}: {base}")
+
+
+def find_local_unet_models(name: str):
+    """Find local UNet models matching the given name, searching recursively."""
+    try:
+        # Use a dictionary to maintain the mapping between model name and path
+        local_model_map = {}
+        # Scan all unet folders for local models
+        for base_dir in folder_paths.get_folder_paths("unet"):
+            if os.path.isdir(base_dir):
+                # Use os.walk to recursively search for model directories
+                for dirpath, dirnames, filenames in os.walk(base_dir, followlinks=True):
+                    # A directory containing 'config.json' is considered a model directory.
+                    if "config.json" in filenames:
+                        model_name = os.path.basename(dirpath)
+                        if name.lower() in model_name.lower() and model_name not in local_model_map:
+                            local_model_map[model_name] = dirpath
+                        # Don't traverse further into a model's subdirectories (e.g., snapshots)
+                        dirnames[:] = []
+
+        # Sort by model name for consistent ordering and unpack into two lists
+        sorted_items = sorted(local_model_map.items())
+        local_models = [item[0]
+                        for item in sorted_items] if sorted_items else []
+        local_models_paths = [item[1]
+                              for item in sorted_items] if sorted_items else []
+    except Exception as e:
+        print(
+            f"Unet-Loader: Could not scan for local models named {name} in unet folder: {e}")
+        local_models = []
+        local_models_paths = []
+    return local_models, local_models_paths
+
 
 class CustomQwen25VLChatHandler(Qwen25VLChatHandler):
     """
