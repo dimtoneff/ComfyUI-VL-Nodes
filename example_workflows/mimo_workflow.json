@@ -1,0 +1,314 @@
+{
+  "id": "9e07843c-8f59-4563-8826-12739285ffca",
+  "revision": 0,
+  "last_node_id": 32,
+  "last_link_id": 52,
+  "nodes": [
+    {
+      "id": 14,
+      "type": "ShowText|pysssss",
+      "pos": [
+        412.00927734375,
+        432.2198181152344
+      ],
+      "size": [
+        356.79998779296875,
+        263.0909118652344
+      ],
+      "flags": {},
+      "order": 4,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "text",
+          "type": "STRING",
+          "link": 48
+        }
+      ],
+      "outputs": [
+        {
+          "name": "STRING",
+          "shape": 6,
+          "type": "STRING",
+          "links": null
+        }
+      ],
+      "title": "THINKING",
+      "properties": {
+        "cnr_id": "comfyui-custom-scripts",
+        "ver": "aac13aa7ce35b07d43633c3bbe654a38c00d74f5",
+        "Node name for S&R": "ShowText|pysssss"
+      },
+      "widgets_values": [
+        "Got it, let's describe the image for Stable Diffusion. First, the scene: two people standing on rocks by a body of water at sunset. The sky is a warm orange-yellow. There are boats on the water—one with a person, another smaller one. Mountains in the background. The overall tone is warm, with silhouettes of the people and boats. Let's structure the prompt.\n\nSo, elements: two people (silhouettes) standing on rocks by a lake or sea at sunset, warm golden light, calm water, two boats (one with a person, one small), distant mountains, orange sky, serene atmosphere. Need to make it concise for SDXL.\n\nPutting it all together: \"Two people standing on rocks by a calm body of water at sunset, warm golden light, two boats on water (one with a person, one small), distant mountains, orange sky, silhouettes, serene atmosphere\""
+      ]
+    },
+    {
+      "id": 13,
+      "type": "ShowText|pysssss",
+      "pos": [
+        739.6253662109375,
+        153.13951110839844
+      ],
+      "size": [
+        249.3433074951172,
+        191.04640197753906
+      ],
+      "flags": {},
+      "order": 5,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "text",
+          "type": "STRING",
+          "link": 50
+        }
+      ],
+      "outputs": [
+        {
+          "name": "STRING",
+          "shape": 6,
+          "type": "STRING",
+          "links": null
+        }
+      ],
+      "title": "PROMPT",
+      "properties": {
+        "cnr_id": "comfyui-custom-scripts",
+        "ver": "aac13aa7ce35b07d43633c3bbe654a38c00d74f5",
+        "Node name for S&R": "ShowText|pysssss"
+      },
+      "widgets_values": [
+        "Two people standing on rocks by a calm body of water at sunset, warm golden light, two boats on water (one with a person, one small), distant mountains, orange sky, silhouettes, serene atmosphere"
+      ]
+    },
+    {
+      "id": 31,
+      "type": "MiMoImageToText",
+      "pos": [
+        415.2330017089844,
+        152.91590881347656
+      ],
+      "size": [
+        314.2135314941406,
+        214.37130737304688
+      ],
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "mimo_model",
+          "type": "MIMO_MODEL",
+          "link": 51
+        },
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "link": 52
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Prompt",
+          "type": "STRING",
+          "links": [
+            49
+          ]
+        },
+        {
+          "name": "Thinking",
+          "type": "STRING",
+          "links": [
+            48
+          ]
+        }
+      ],
+      "properties": {
+        "aux_id": "dimtoneff/ComfyUI-VL-Nodes",
+        "ver": "8e0e876a96488dabe86f09d3696364ef74d1b52e",
+        "Node name for S&R": "MiMoImageToText"
+      },
+      "widgets_values": [
+        true,
+        "You are an assistant who perfectly describes images. Fully describe the image as a prompt for Stable Diffusion text2image SDXL model. If you see nsfw stuff describe it too. Do not omit anything! Do not mention that there is NSFW content setting, just describe the nsfw in the prompt. !Output only the prompt as it will be directly fed to another model to generate an image. Be clear and use short sentences to describe the image!",
+        "What it is on this image?",
+        128000
+      ]
+    },
+    {
+      "id": 12,
+      "type": "LoadImage",
+      "pos": [
+        136.4893035888672,
+        368.60675048828125
+      ],
+      "size": [
+        272.87799072265625,
+        326
+      ],
+      "flags": {
+        "collapsed": false
+      },
+      "order": 0,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            52
+          ]
+        },
+        {
+          "name": "MASK",
+          "type": "MASK",
+          "links": null
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.49",
+        "Node name for S&R": "LoadImage"
+      },
+      "widgets_values": [
+        "pexels-enesersahin-29529439.jpg",
+        "image"
+      ]
+    },
+    {
+      "id": 32,
+      "type": "MiMoFreeMemoryAPI",
+      "pos": [
+        780.7821044921875,
+        386.2331848144531
+      ],
+      "size": [
+        197.83065795898438,
+        26
+      ],
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "anything",
+          "type": "*",
+          "link": 49
+        }
+      ],
+      "outputs": [
+        {
+          "name": "output",
+          "type": "*",
+          "links": [
+            50
+          ]
+        }
+      ],
+      "properties": {
+        "aux_id": "dimtoneff/ComfyUI-VL-Nodes",
+        "ver": "8e0e876a96488dabe86f09d3696364ef74d1b52e",
+        "Node name for S&R": "MiMoFreeMemoryAPI"
+      }
+    },
+    {
+      "id": 30,
+      "type": "MiMoModelLoader",
+      "pos": [
+        134.92440795898438,
+        149.6374053955078
+      ],
+      "size": [
+        270,
+        178
+      ],
+      "flags": {},
+      "order": 1,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "mimo_model",
+          "type": "MIMO_MODEL",
+          "links": [
+            51
+          ]
+        }
+      ],
+      "properties": {
+        "aux_id": "dimtoneff/ComfyUI-VL-Nodes",
+        "ver": "8e0e876a96488dabe86f09d3696364ef74d1b52e",
+        "Node name for S&R": "MiMoModelLoader"
+      },
+      "widgets_values": [
+        "MiMo-VL-7B-RL-UD-Q6_K_XL.gguf",
+        "mmproj-MiMo-VL-7B-F32.gguf",
+        -1,
+        4096,
+        "cuda",
+        "disable"
+      ]
+    }
+  ],
+  "links": [
+    [
+      48,
+      31,
+      1,
+      14,
+      0,
+      "STRING"
+    ],
+    [
+      49,
+      31,
+      0,
+      32,
+      0,
+      "*"
+    ],
+    [
+      50,
+      32,
+      0,
+      13,
+      0,
+      "STRING"
+    ],
+    [
+      51,
+      30,
+      0,
+      31,
+      0,
+      "MIMO_MODEL"
+    ],
+    [
+      52,
+      12,
+      0,
+      31,
+      1,
+      "IMAGE"
+    ]
+  ],
+  "groups": [],
+  "config": {},
+  "extra": {
+    "ds": {
+      "scale": 1.4641000000000008,
+      "offset": [
+        -39.3025121608109,
+        136.81843557994117
+      ]
+    },
+    "frontendVersion": "1.25.9",
+    "VHS_latentpreview": false,
+    "VHS_latentpreviewrate": 0,
+    "VHS_MetadataImage": true,
+    "VHS_KeepIntermediate": true
+  },
+  "version": 0.4
+}

@@ -1,0 +1,125 @@
+# ComfyUI-VL-Nodes
+
+This repository provides a collection of custom nodes for ComfyUI that integrate various Vision-Language (VL) models. These nodes allow you to perform tasks like image captioning, visual question answering (VQA), and generating detailed image descriptions directly within your ComfyUI workflows. This is particularly useful for creating rich prompts for text-to-image models. These nodes were for my own usage and experimentation but I decided to share them with the community. Feel free to fork this repo and expand the suport for VL models.
+
+![](./example_workflows/lfm2_workflow.JPG)
+![](./example_workflows/mimo_workflow.JPG)
+![](./example_workflows/ovis_u1_workflow.JPG)
+
+## Features
+
+This project includes nodes for the following models:
+
+* **Xiaomi MiMo-VL GGUF only**: Utilizes GGUF models for efficient image-to-text generation (MiMo-VL-7B-RL-GGUF).
+* **LiquidAI LFM2-VL transformers only**: Supports Hugging Face transformer models for image-to-text tasks (LiquidAI/LFM2-VL-450M, LiquidAI/LFM2-VL-1.6B).
+* **AIDC-AI Ovis-U1 transformers only**: Provides nodes for the Ovis-U1 model for image captioning (AIDC-AI/Ovis-U1-3B).
+* **General Utilities**: Includes a `Free Memory` node to help manage VRAM by unloading all loaded VL models.
+
+## Installation
+
+### Prerequisites
+
+* ComfyUI installed and set up.
+* For LFM2-VL models you need **transformers>=4.54.0**
+* For GGUF models (like MiMo-VL), **llama-cpp-python with CUDA support** is highly recommended for performance. Follow the compilation instructions below.
+* For Ovis-U1 you need **flash-attn**. Prebuilt wheels: [HERE](https://github.com/mjun0812/flash-attention-prebuild-wheels/releases)
+
+### Compiling `llama-cpp-python` with CUDA (Recommended for GGUF)
+
+For GPU acceleration with GGUF models, `llama-cpp-python` must be compiled with CUDA support.
+
+*   **Pre-built Wheels (Easiest Method)**: You can often find pre-compiled wheels for Windows and Linux here: [https://github.com/JamePeng/llama-cpp-python/releases](https://github.com/JamePeng/llama-cpp-python/releases)
+*   **Manual Compilation (Windows)**:
+    1.  **Install Build Tools**: Install Visual Studio (e.g., 2022) with the "Desktop development with C++" workload and the NVIDIA CUDA Toolkit.
+    2.  **Open Command Prompt**: Open the "x64 Native Tools Command Prompt for VS 2022".
+    3.  **Activate ComfyUI's venv**.
+    4.  **Install build dependencies**: `pip install cmake ninja`
+    5.  **Clone and Build**:
+        ```bash
+        git clone --recurse-submodules https://github.com/abetlen/llama-cpp-python.git
+        cd llama-cpp-python
+        set FORCE_CMAKE=1
+        set CMAKE_ARGS=-DGGML_CUDA=on -G Ninja
+        set GGML_CUDA=1
+        set LLAMA_BUILD_EXAMPLES=OFF
+        set LLAMA_BUILD_TESTS=OFF
+        set CMAKE_BUILD_PARALLEL_LEVEL=8
+        pip install --force-reinstall --no-cache-dir .
+        ```
+    6.  **Restart ComfyUI**.
+
+You might not need CMAKE_BUILD_PARALLEL_LEVEL if you used -G Ninja.
+
+### Node Installation
+
+1.  **Clone this repository** into your `ComfyUI/custom_nodes/` directory:
+    ```bash
+    cd ComfyUI/custom_nodes/
+    git clone https://github.com/dimtoneff/ComfyUI-VL-Nodes.git
+    ```
+2.  **Install Python Dependencies**:
+    ```bash
+    cd ComfyUI-VL-Nodes
+    pip install -r requirements.txt
+    ```
+3.  **Restart ComfyUI**.
+
+## Model Downloads
+
+Each model type has its own requirements for model files.
+
+### MiMo-VL (GGUF)
+
+*   **Models**: You need the main GGUF model (e.g., `mimo-vl-7b-q4_k_m.gguf`) and the corresponding CLIP vision model (e.g., `mmproj-model-f16.gguf`). A good source is [unsloth/MiMo-VL-7B-RL-GGUF](https://huggingface.co/unsloth/MiMo-VL-7B-RL-GGUF).
+*   **Location**: Place both files in the same directory. You can use `ComfyUI/models/unet` for the main model and `ComfyUI/models/clip` for the vision model, or use a shared directory.
+*   **Example `extra_model_paths.yaml`**:
+    ```yaml
+    llm:
+        base_path: X:\LLM
+        unet: unsloth/MiMo-VL-7B-RL-GGUF
+        clip: unsloth/MiMo-VL-7B-RL-GGUF
+    ```
+
+### LFM2-VL (Hugging Face)
+
+*   **Models**: These are downloaded automatically from the Hugging Face Hub.
+*   **Location**: They will be saved to `ComfyUI/models/unet/LFM2-VL-HF`.
+
+### Ovis-U1 (Hugging Face)
+
+*   **Models**: These can be downloaded automatically from the Hugging Face Hub.
+*   **Location**: They will be saved to a subdirectory inside `ComfyUI/models/unet`.
+
+## Usage
+
+Once installed, you will find the nodes under the `MiMo`, `LFM2-VL`, and `Ovis-U1` categories.
+
+### MiMo Nodes
+
+*   **`Load MiMo GGUF Model`**: Loads the MiMo GGUF model and its vision projector.
+*   **`MiMo Image to Text`**: Generates a detailed description of an image based on a prompt.
+
+### LFM2-VL Nodes
+
+*   **`Load LFM2-VL HF Model`**: Loads LFM2-VL transformer models from Hugging Face.
+*   **`LFM2-VL HF Image to Text`**: Generates text from an image using the loaded HF model.
+
+### Ovis-U1 Nodes
+
+*   **`Load Ovis-U1 Model`**: Loads Ovis-U1 models from Hugging Face.
+*   **`Ovis-U1 Image Caption`**: Generates a caption for an image.
+
+### Memory Node
+
+*   **`Free Memory (VL Nodes)`** (Category: `VL-Nodes/Memory`): Unloads all loaded VL models to free up VRAM.
+
+## Example Workflow
+
+1.  Load a model using one of the `Load...` nodes (e.g., `Load MiMo GGUF Model`).
+2.  Load an image using a standard ComfyUI `Load Image` node.
+3.  Connect the model and image to the corresponding `Image to Text` or `Image Caption` node.
+4.  The text output can then be fed into a `CLIP Text Encode` node for your text-to-image pipeline.
+
+## Special Thanks and Links
+
+<a href="https://www.flaticon.com/free-icons/visual" title="visual icons">Visual icons created by Freepik - Flaticon</a>

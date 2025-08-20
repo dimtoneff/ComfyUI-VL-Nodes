@@ -1,0 +1,28 @@
+[project]
+name = "comfyui-vl-nodes"
+description = "A collection of custom nodes for ComfyUI that integrates various Vision-Language (VL) models, including Xiaomi MiMo-VL, LiquidAI LFM2-VL, and AIDC-AI Ovis-U1. Tested with models: MiMo-VL-7B-RL-GGUF, LiquidAI/LFM2-VL-450M, LiquidAI/LFM2-VL-1.6B, AIDC-AI/Ovis-U1-3B."
+version = "0.2"
+license = { file = "LICENSE" }
+dependencies = [
+    "torch",
+    "Pillow",
+    "numpy>=1.25.0,<2.0.0",
+    "scipy>=1.11.3",
+    "llama-cpp-python[cuda]",
+    "accelerate",
+    "sentencepiece",
+    "huggingface_hub",
+    "transformers>=4.54.0",
+    "qwen-vl-utils",
+    "bitsandbytes",
+    "flash-attn==2.7.4"
+]
+
+[project.urls]
+Repository = "https://github.com/dimtoneff/ComfyUI-VL-Nodes"
+#  Used by Comfy Registry https://comfyregistry.org
+
+[tool.comfy]
+PublisherId = "dimtoneff"
+DisplayName = "ComfyUI-VL-Nodes"
+Icon = "https://raw.githubusercontent.com/dimtoneff/ComfyUI-VL-Nodes/main/icon.png"

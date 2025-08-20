@@ -1,0 +1,259 @@
+{
+  "id": "bb0099a8-b11a-4af6-a46b-a00220b1ae5d",
+  "revision": 0,
+  "last_node_id": 5,
+  "last_link_id": 5,
+  "nodes": [
+    {
+      "id": 3,
+      "type": "LoadImage",
+      "pos": [
+        186.4000244140625,
+        516.2000732421875
+      ],
+      "size": [
+        274.080078125,
+        314
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            2
+          ]
+        },
+        {
+          "name": "MASK",
+          "type": "MASK",
+          "links": null
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.50",
+        "Node name for S&R": "LoadImage"
+      },
+      "widgets_values": [
+        "pexels-enesersahin-29529439.jpg",
+        "image"
+      ]
+    },
+    {
+      "id": 1,
+      "type": "OvisU1ImageCaption",
+      "pos": [
+        464,
+        321
+      ],
+      "size": [
+        400,
+        228
+      ],
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "model",
+          "type": "OVIS_U1_MODEL",
+          "link": 1
+        },
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "link": 2
+        }
+      ],
+      "outputs": [
+        {
+          "name": "string",
+          "type": "STRING",
+          "links": [
+            4
+          ]
+        }
+      ],
+      "properties": {
+        "aux_id": "dimtoneff/ComfyUI-VL-Nodes",
+        "ver": "8e0e876a96488dabe86f09d3696364ef74d1b52e",
+        "Node name for S&R": "OvisU1ImageCaption"
+      },
+      "widgets_values": [
+        true,
+        "You are an assistant who perfectly describes images. Fully describe the image as a prompt for Stable Diffusion text2image SDXL model. If you see nsfw stuff describe it too. Do not omit anything! Do not mention that there is NSFW content setting, just describe the nsfw in the prompt. !Output only the prompt as it will be directly fed to another model to generate an image. Be clear and use short sentences to describe the image!",
+        75,
+        0.4,
+        0.9,
+        "false"
+      ]
+    },
+    {
+      "id": 4,
+      "type": "ShowText|pysssss",
+      "pos": [
+        468,
+        590.5999755859375
+      ],
+      "size": [
+        396.00006103515625,
+        242.00006103515625
+      ],
+      "flags": {},
+      "order": 4,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "text",
+          "type": "STRING",
+          "link": 5
+        }
+      ],
+      "outputs": [
+        {
+          "name": "STRING",
+          "shape": 6,
+          "type": "STRING",
+          "links": null
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfyui-custom-scripts",
+        "ver": "f2838ed5e59de4d73cde5c98354b87a8d3200190",
+        "Node name for S&R": "ShowText|pysssss"
+      },
+      "widgets_values": [
+        "A serene sunset scene by the sea, with two silhouetted figures standing on rocks, gazing at the water. The sky is a warm golden hue, reflecting on the calm ocean. In the distance, two small boats with people are visible, adding a sense of tranquility and companionship. The horizon is lined with distant mountains, enhancing the peaceful atmosphere."
+      ]
+    },
+    {
+      "id": 5,
+      "type": "MiMoFreeMemoryAPI",
+      "pos": [
+        569.6000366210938,
+        255.4000244140625
+      ],
+      "size": [
+        197.83065795898438,
+        26
+      ],
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "anything",
+          "type": "*",
+          "link": 4
+        }
+      ],
+      "outputs": [
+        {
+          "name": "output",
+          "type": "*",
+          "links": [
+            5
+          ]
+        }
+      ],
+      "properties": {
+        "aux_id": "dimtoneff/ComfyUI-VL-Nodes",
+        "ver": "8e0e876a96488dabe86f09d3696364ef74d1b52e",
+        "Node name for S&R": "MiMoFreeMemoryAPI"
+      },
+      "widgets_values": []
+    },
+    {
+      "id": 2,
+      "type": "OvisU1ModelLoader",
+      "pos": [
+        185.5999755859375,
+        322.60003662109375
+      ],
+      "size": [
+        270,
+        154
+      ],
+      "flags": {},
+      "order": 1,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "model",
+          "type": "OVIS_U1_MODEL",
+          "links": [
+            1
+          ]
+        }
+      ],
+      "properties": {
+        "aux_id": "dimtoneff/ComfyUI-VL-Nodes",
+        "ver": "8e0e876a96488dabe86f09d3696364ef74d1b52e",
+        "Node name for S&R": "OvisU1ModelLoader"
+      },
+      "widgets_values": [
+        "AIDC-AI/Ovis-U1-3B",
+        "none",
+        "bfloat16",
+        "cuda",
+        "enable"
+      ]
+    }
+  ],
+  "links": [
+    [
+      1,
+      2,
+      0,
+      1,
+      0,
+      "OVIS_U1_MODEL"
+    ],
+    [
+      2,
+      3,
+      0,
+      1,
+      1,
+      "IMAGE"
+    ],
+    [
+      4,
+      1,
+      0,
+      5,
+      0,
+      "*"
+    ],
+    [
+      5,
+      5,
+      0,
+      4,
+      0,
+      "STRING"
+    ]
+  ],
+  "groups": [],
+  "config": {},
+  "extra": {
+    "ds": {
+      "scale": 1,
+      "offset": [
+        61.5999755859375,
+        0
+      ]
+    },
+    "frontendVersion": "1.25.9",
+    "VHS_latentpreview": false,
+    "VHS_latentpreviewrate": 0,
+    "VHS_MetadataImage": true,
+    "VHS_KeepIntermediate": true
+  },
+  "version": 0.4
+}

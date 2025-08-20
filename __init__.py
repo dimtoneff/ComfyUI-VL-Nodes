@@ -1,0 +1,29 @@
+# import atexit
+from .mimo_nodes import NODE_CLASS_MAPPINGS, NODE_DISPLAY_NAME_MAPPINGS, unload_all_mimo_models
+from .lfm2_nodes import NODE_CLASS_MAPPINGS as LFM2_NODE_CLASS_MAPPINGS, NODE_DISPLAY_NAME_MAPPINGS as LFM2_NODE_DISPLAY_NAME_MAPPINGS, unload_all_lfm2_hf_models
+from .ovisu1_nodes import NODE_CLASS_MAPPINGS as OVISU1_NODE_CLASS_MAPPINGS, NODE_DISPLAY_NAME_MAPPINGS as OVISU1_NODE_DISPLAY_NAME_MAPPINGS, unload_all_ovisu1_models
+from .general_nodes import NODE_CLASS_MAPPINGS as GENERAL_NODE_CLASS_MAPPINGS, NODE_DISPLAY_NAME_MAPPINGS as GENERAL_NODE_DISPLAY_NAME_MAPPINGS
+
+# Merge all node mappings
+NODE_CLASS_MAPPINGS.update(LFM2_NODE_CLASS_MAPPINGS)
+NODE_CLASS_MAPPINGS.update(OVISU1_NODE_CLASS_MAPPINGS)
+NODE_CLASS_MAPPINGS.update(GENERAL_NODE_CLASS_MAPPINGS)
+
+# Merge all display name mappings
+NODE_DISPLAY_NAME_MAPPINGS.update(LFM2_NODE_DISPLAY_NAME_MAPPINGS)
+NODE_DISPLAY_NAME_MAPPINGS.update(OVISU1_NODE_DISPLAY_NAME_MAPPINGS)
+NODE_DISPLAY_NAME_MAPPINGS.update(GENERAL_NODE_DISPLAY_NAME_MAPPINGS)
+
+WEB_DIRECTORY = "./js"
+
+# def cleanup_models():
+#     print("ComfyUI-VL-Nodes: Server is shutting down. Unloading all models.")
+#     unload_all_mimo_models()
+#     unload_all_lfm2_hf_models()
+#     unload_all_ovisu1_models()
+
+
+# atexit.register(cleanup_models)
+
+__all__ = ['NODE_CLASS_MAPPINGS',
+           'NODE_DISPLAY_NAME_MAPPINGS', 'WEB_DIRECTORY']
