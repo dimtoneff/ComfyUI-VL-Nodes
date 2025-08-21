@@ -5,14 +5,18 @@ import torch
 import requests
 from comfy.cli_args import args
 import comfy.model_management
-from .utils import any_type
 from .mimo_nodes import unload_all_mimo_models
 from .lfm2_nodes import unload_all_lfm2_hf_models
 from .ovisu1_nodes import unload_all_ovisu1_models
 from .ovis25_nodes import unload_all_ovis25_models
+from .keye_nodes import unload_all_keye_models
+from ..utils import any_type
 
 
 class MiMoFreeMemoryAPI:
+    def __init__(self):
+        self.add_waiting = None
+
     @classmethod
     def INPUT_TYPES(s):
         return {
@@ -40,6 +44,10 @@ class MiMoFreeMemoryAPI:
 
         # Unload Ovis-2.5 models
         unload_all_ovis25_models()
+
+        # Unload Keye models
+        unload_all_keye_models()
+
         if self.add_waiting:
             time.sleep(1)
 

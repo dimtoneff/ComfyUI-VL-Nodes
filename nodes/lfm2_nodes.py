@@ -6,7 +6,7 @@ from transformers import AutoModelForImageTextToText, AutoProcessor
 from transformers.utils.quantization_config import BitsAndBytesConfig
 import folder_paths
 from torch.amp.autocast_mode import autocast
-from .utils import tensor2pil, find_local_unet_models
+from ..utils import tensor2pil, find_local_unet_models
 
 # Global registry for LFM2 loaders
 # _lfm2_gguf_loader_instances = []

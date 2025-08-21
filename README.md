@@ -12,6 +12,9 @@ This project includes nodes for the following models:
 * **LiquidAI LFM2-VL transformers only**: Supports Hugging Face transformer models for image-to-text tasks (LiquidAI/LFM2-VL-450M, LiquidAI/LFM2-VL-1.6B).
 * **AIDC-AI Ovis-U1 transformers only**: Provides nodes for the Ovis-U1 model for image captioning (AIDC-AI/Ovis-U1-3B).
 * **AIDC-AI Ovis-2.5 transformers only**: Adds support for the Ovis-2.5 model series (AIDC-AI/Ovis2.5-2B, AIDC-AI/Ovis2.5-9B).
+  * **WARNING**: AIDC-AI/Ovis2.5-9B is a chunky model (18Gb+). Be aware before starting to download!
+* **Kwai-Keye Keye-VL transformers only**: Adds support for the Keye-VL model (Kwai-Keye/Keye-VL-8B-Preview).
+  * **WARNING**: Kwai-Keye/Keye-VL-8B-Preview is a chunky model (17Gb+)
 * **General Utilities**: Includes a `Free Memory` node to help manage VRAM by unloading all loaded VL models.
 
 ## Installation
@@ -21,7 +24,7 @@ This project includes nodes for the following models:
 * ComfyUI installed and set up.
 * For LFM2-VL models you need **transformers>=4.54.0**
 * For GGUF models (like MiMo-VL), **llama-cpp-python with CUDA support** is highly recommended for performance. Follow the compilation instructions below.
-* For Ovis-U1 you need **flash-attn**. Prebuilt wheels: [HERE](https://github.com/mjun0812/flash-attention-prebuild-wheels/releases)
+* For Ovis-U1 and Keye-VL you need **flash-attn**. Prebuilt wheels: [HERE](https://github.com/mjun0812/flash-attention-prebuild-wheels/releases)
 
 ### Compiling `llama-cpp-python` with CUDA (Recommended for GGUF)
 
@@ -94,10 +97,15 @@ Each model type has its own requirements for model files.
 *   **Models**: These can be downloaded automatically from the Hugging Face Hub.
 *   **Location**: They will be saved to a subdirectory inside `ComfyUI/models/unet`.
 
+### Keye-VL (Hugging Face)
+
+*   **Models**: These can be downloaded automatically from the Hugging Face Hub.
+*   **Location**: They will be saved to a subdirectory inside `ComfyUI/models/unet`.
+
 
 ## Usage
 
-Once installed, you will find the nodes under the `MiMo`, `LFM2-VL`, `Ovis2.5` and `Ovis-U1` categories. Or double left click on empty space and search for the model name to see the nodes.
+Once installed, you will find the nodes under the `MiMo`, `LFM2-VL`, `Ovis2.5`, `Ovis-U1` and `Keye-VL` categories. Or double left click on empty space and search for the model name to see the nodes.
 
 ### MiMo Nodes
 
@@ -118,6 +126,15 @@ Once installed, you will find the nodes under the `MiMo`, `LFM2-VL`, `Ovis2.5` a
 
 *   **`Load Ovis-2.5 Model`**: Loads Ovis-2.5 models from Hugging Face.
 *   **`Ovis-2.5 Image to Text`**: Generates text from an image using the loaded model, with optional "thinking" output.
+
+### Keye-VL Nodes
+
+*   **`Load Keye-VL Model`**: Loads Keye-VL models from Hugging Face.
+*   **`Keye-VL Image to Text`**: Generates text from an image using the loaded model. It supports multiple thinking modes:
+    *   **Non-Thinking Mode**: Appends `/no_think` to the prompt for a direct response.
+    *   **Auto-Thinking Mode**: Default behavior, the model decides whether to "think".
+    *   **Thinking Mode**: Appends `/think` to the prompt to encourage a more detailed, reasoned response.
+*   **Image Resolution**: You can control the image resolution for a potential performance boost by setting `min_pixels` and `max_pixels`, or `resized_height` and `resized_width`.
 
 
 ### Memory Node

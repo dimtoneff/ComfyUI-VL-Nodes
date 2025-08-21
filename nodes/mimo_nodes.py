@@ -8,7 +8,7 @@ import html
 from llama_cpp import Llama
 import folder_paths
 import comfy.model_management
-from .utils import any_type, tensor2pil, resize_pil_image, CustomQwen25VLChatHandler, update_folder_names_and_paths
+from ..utils import tensor2pil, resize_pil_image, CustomQwen25VLChatHandler, update_folder_names_and_paths
 
 # Add a custom keys for files ending in .gguf
 update_folder_names_and_paths("unet_gguf", ["diffusion_models", "unet"])

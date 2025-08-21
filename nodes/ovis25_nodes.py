@@ -7,7 +7,7 @@ from huggingface_hub import snapshot_download
 from torch.amp.autocast_mode import autocast
 import comfy.model_management
 import folder_paths
-from .utils import tensor2pil, resize_pil_image, find_local_unet_models
+from ..utils import tensor2pil, resize_pil_image, find_local_unet_models
 
 # Create a directory for Ovis-2.5 models
 ovis25_dir = os.path.join(
@@ -50,7 +50,7 @@ class Ovis25ModelLoader:
 
         default_model = "AIDC-AI/Ovis2.5-2B"
 
-        return {
+        inputs = {
             "required": {
                 "model_name": (all_model_options, {"default": default_model}),
                 "precision": (["bfloat16", "float16", "float32"], {"default": "bfloat16"}),
@@ -58,6 +58,8 @@ class Ovis25ModelLoader:
                 "auto_download": (["enable", "disable"], {"default": "enable"}),
             }
         }
+
+        return inputs
 
     RETURN_TYPES = ("OVIS25_MODEL",)
     RETURN_NAMES = ("ovis25_model",)
@@ -103,7 +105,9 @@ class Ovis25ModelLoader:
             "model_name": model_name,
             "precision": precision,
             "device": device,
+            "auto_download": auto_download,
         }
+
         if self.model is not None and self.cached_params == current_params:
             print("Ovis-2.5: Reusing cached model.")
             return ({"model": self.model, "text_tokenizer": self.text_tokenizer, "device": device, "dtype": self.model.dtype},)
@@ -186,7 +190,7 @@ class Ovis25ImageToText:
                 "enable_thinking_budget": ("BOOLEAN", {"default": True}),
                 "max_new_tokens": ("INT", {"default": 3072, "min": 64, "max": 8192, "tooltip": "Max new tokens for the response. Must be > thinking_budget + 25."}),
                 "thinking_budget": ("INT", {"default": 2048, "min": 64, "max": 8192, "tooltip": "Token budget for the thinking process."}),
-                "temperature": ("FLOAT", {"default": 0.7, "min": 0.0, "max": 1.0, "step": 0.1}),
+                "temperature": ("FLOAT", {"default": 0.7, "min": 0.1, "max": 1.0, "step": 0.1}),
                 "top_p": ("FLOAT", {"default": 0.9, "min": 0.1, "max": 1.0, "step": 0.01}),
                 "do_sample": (["true", "false"], {"default": "false"}),
             }

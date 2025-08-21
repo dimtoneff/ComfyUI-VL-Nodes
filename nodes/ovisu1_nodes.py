@@ -9,7 +9,7 @@ from huggingface_hub import snapshot_download
 from torch.amp.autocast_mode import autocast
 import comfy.model_management
 import folder_paths
-from .utils import tensor2pil, resize_pil_image, find_local_unet_models
+from ..utils import tensor2pil, resize_pil_image, find_local_unet_models
 
 # Create a directory for Ovis-U1 models
 ovis_u1_dir = os.path.join(

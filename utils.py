@@ -4,6 +4,7 @@ import numpy as np
 from PIL import Image
 import logging
 import folder_paths
+import torch
 from llama_cpp.llama_chat_format import Qwen25VLChatHandler
 
 try:
@@ -115,3 +116,18 @@ class CustomQwen25VLChatHandler(Qwen25VLChatHandler):
     def __del__(self):
         """Ensure resources are released upon garbage collection."""
         self.close()
+
+
+def get_torch_device():
+    if torch.cuda.is_available():
+        return torch.device("cuda")
+    if hasattr(torch.backends, "mps") and torch.backends.mps.is_available():
+        return torch.device("mps")
+    return torch.device("cpu")
+
+
+def is_fp16_available():
+    if torch.cuda.is_available():
+        device_capability = torch.cuda.get_device_capability()
+        return device_capability[0] >= 7
+    return False
