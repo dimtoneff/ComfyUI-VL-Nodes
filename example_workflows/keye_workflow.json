@@ -1,0 +1,327 @@
+{
+  "id": "bb0099a8-b11a-4af6-a46b-a00220b1ae5d",
+  "revision": 0,
+  "last_node_id": 12,
+  "last_link_id": 19,
+  "nodes": [
+    {
+      "id": 6,
+      "type": "MiMoFreeMemoryAPI",
+      "pos": [
+        189.9937286376953,
+        193.02944946289062
+      ],
+      "size": [
+        270,
+        58
+      ],
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "anything",
+          "type": "*",
+          "link": 18
+        }
+      ],
+      "outputs": [
+        {
+          "name": "output",
+          "type": "*",
+          "links": [
+            12
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfyui-vl-nodes",
+        "ver": "6ab7af32e11476b93ee4c8f99488c3f648c838b0",
+        "Node name for S&R": "MiMoFreeMemoryAPI"
+      },
+      "widgets_values": [
+        false
+      ]
+    },
+    {
+      "id": 3,
+      "type": "LoadImage",
+      "pos": [
+        188.0000457763672,
+        568.9876098632812
+      ],
+      "size": [
+        274.080078125,
+        314
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            16
+          ]
+        },
+        {
+          "name": "MASK",
+          "type": "MASK",
+          "links": null
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.50",
+        "Node name for S&R": "LoadImage"
+      },
+      "widgets_values": [
+        "16_colors.webp",
+        "image"
+      ]
+    },
+    {
+      "id": 4,
+      "type": "ShowText|pysssss",
+      "pos": [
+        467.1073913574219,
+        649.169921875
+      ],
+      "size": [
+        385.54107666015625,
+        232.0886688232422
+      ],
+      "flags": {},
+      "order": 5,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "text",
+          "type": "STRING",
+          "link": 12
+        }
+      ],
+      "outputs": [
+        {
+          "name": "STRING",
+          "shape": 6,
+          "type": "STRING",
+          "links": null
+        }
+      ],
+      "title": "PROMPT",
+      "properties": {
+        "cnr_id": "comfyui-custom-scripts",
+        "ver": "f2838ed5e59de4d73cde5c98354b87a8d3200190",
+        "Node name for S&R": "ShowText|pysssss"
+      },
+      "widgets_values": [
+        "Pixel art style, large cruise ship on calm water, sunset with orange-red sky, clouds, green mountain in the background, detailed cruise ship with windows and deck, pixelated texture, warm color tones, serene atmosphere, reflections on water, distant mountains, setting sun."
+      ]
+    },
+    {
+      "id": 12,
+      "type": "ShowText|pysssss",
+      "pos": [
+        465.0640563964844,
+        917.8933715820312
+      ],
+      "size": [
+        387.0323486328125,
+        251.9955291748047
+      ],
+      "flags": {},
+      "order": 4,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "text",
+          "type": "STRING",
+          "link": 19
+        }
+      ],
+      "outputs": [
+        {
+          "name": "STRING",
+          "shape": 6,
+          "type": "STRING",
+          "links": null
+        }
+      ],
+      "title": "THINKING",
+      "properties": {
+        "cnr_id": "comfyui-custom-scripts",
+        "ver": "f2838ed5e59de4d73cde5c98354b87a8d3200190",
+        "Node name for S&R": "ShowText|pysssss"
+      },
+      "widgets_values": [
+        "The user now needs to describe the image content in detail, including elements such as the pixel art style, cruise ship, sunset, mountains, and water. First, analyze the image: it is a pixel art style image featuring a large cruise ship on the water, with a sunset in the background, mountains, and clouds. The color palette includes orange, green, blue, and white. The scene is a sunset by the sea, with the cruise ship docked or sailing, surrounded by mountains and clouds, with the sun near the horizon.\n\nNow organize the description: Pixel art style, large cruise ship, calm water, sunset, orange-red sky, clouds, green mountains, details of the cruise ship (windows, deck, structure), pixelated texture, warm color tones, serene atmosphere, dock or seaside, reflections on the water, distant mountains, setting sun.\n\nEnsure all elements are included, and the description is clear and concise, without omitting details."
+      ]
+    },
+    {
+      "id": 11,
+      "type": "KeyeNode",
+      "pos": [
+        469.27166748046875,
+        192.42384338378906
+      ],
+      "size": [
+        383.7716064453125,
+        421.20208740234375
+      ],
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "keye_model",
+          "type": "KEYE_MODEL",
+          "link": 17
+        },
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "link": 16
+        }
+      ],
+      "outputs": [
+        {
+          "name": "description",
+          "type": "STRING",
+          "links": [
+            18
+          ]
+        },
+        {
+          "name": "thinking_analysis",
+          "type": "STRING",
+          "links": [
+            19
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfyui-vl-nodes",
+        "ver": "3fc0fb43170dba5b20caeec61508d81c99e974ad",
+        "Node name for S&R": "KeyeNode"
+      },
+      "widgets_values": [
+        "You are an assistant who perfectly describes images. Fully describe the image as a prompt for Stable Diffusion text2image SDXL model. If you see nsfw stuff describe it too. Do not omit anything! Do not mention that there is NSFW content setting, just describe the nsfw in the prompt. !Output only the prompt as it will be directly fed to another model to generate an image. Be clear and use short sentences to describe the image! Return only the prompt without saying \"Prompt\"",
+        "Thinking",
+        "Exact Dimensions",
+        "cuda",
+        512,
+        0.1,
+        0.9,
+        "false",
+        72891686296218,
+        "randomize",
+        200704,
+        1003520,
+        512,
+        0
+      ]
+    },
+    {
+      "id": 10,
+      "type": "KeyeModelLoader",
+      "pos": [
+        184.79998779296875,
+        297
+      ],
+      "size": [
+        281.427734375,
+        226
+      ],
+      "flags": {},
+      "order": 1,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "keye_model",
+          "type": "KEYE_MODEL",
+          "links": [
+            17
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfyui-vl-nodes",
+        "ver": "3fc0fb43170dba5b20caeec61508d81c99e974ad",
+        "Node name for S&R": "KeyeModelLoader"
+      },
+      "widgets_values": [
+        "Kwai-Keye/Keye-VL-8B-Preview",
+        "4bit",
+        "bfloat16",
+        "cuda",
+        "enable",
+        200704,
+        1003520,
+        "enable"
+      ]
+    }
+  ],
+  "links": [
+    [
+      12,
+      6,
+      0,
+      4,
+      0,
+      "STRING"
+    ],
+    [
+      16,
+      3,
+      0,
+      11,
+      1,
+      "IMAGE"
+    ],
+    [
+      17,
+      10,
+      0,
+      11,
+      0,
+      "KEYE_MODEL"
+    ],
+    [
+      18,
+      11,
+      0,
+      6,
+      0,
+      "*"
+    ],
+    [
+      19,
+      11,
+      1,
+      12,
+      0,
+      "STRING"
+    ]
+  ],
+  "groups": [],
+  "config": {},
+  "extra": {
+    "ds": {
+      "scale": 1.2100000000000006,
+      "offset": [
+        -0.030415501297334835,
+        -74.10665723885236
+      ]
+    },
+    "frontendVersion": "1.25.9",
+    "VHS_latentpreview": false,
+    "VHS_latentpreviewrate": 0,
+    "VHS_MetadataImage": true,
+    "VHS_KeepIntermediate": true
+  },
+  "version": 0.4
+}

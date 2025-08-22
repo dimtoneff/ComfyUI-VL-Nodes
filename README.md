@@ -154,6 +154,7 @@ Once installed, you will find the nodes under the `MiMo`, `LFM2-VL`, `Ovis2.5`, 
 
 ## Other examples
 
+![](./example_workflows/keye_workflow.JPG)
 ![](./example_workflows/lfm2_workflow.JPG)
 ![](./example_workflows/mimo_workflow.JPG)
 ![](./example_workflows/ovis_u1_workflow.JPG)
