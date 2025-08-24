@@ -6,12 +6,12 @@ This repository provides a collection of custom nodes for ComfyUI that integrate
 
 ## Batch Image Captioning (version>=0.6)
 
-A key feature of this custom node set is the ability to caption a whole directory of images in one go. By using the `Load Images/FileNames from Dir (Batch)(VL)` or `Load Images/FileNames from Dir (List)(VL)` nodes, you can feed a series of images into any of the supported VL models and generate captions for each one. The workflow is designed to save the generated text files next to the original images, making it easy to manage large datasets for training or analysis.
+A key feature of this custom node set is the ability to caption a whole directory of images in one go. By using the `Load Images From Dir (Batch) [VL]` or `Load Images From Dir (List) [VL]` nodes, you can feed a series of images into any of the supported VL models and generate captions for each one. The workflow is designed to save the generated text files next to the original images, making it easy to manage large datasets for training or analysis.
 
 * Input is a directory with a batch of images
 * The output is a batch of single .txt files with the same name as the image with the description in it, saved in the same directory as the images
 * You can add a special token as a prefix
-* You are going to need to install the `Save Text File` node from [was-node-suite-comfyu](https://github.com/WASasquatch/was-node-suite-comfyuil)
+* You are going to need to install the `Save Text File` node from [was-node-suite-comfyu](https://github.com/WASasquatch/was-node-suite-comfyui)
 * **All the model nodes were updated to support batch image captioning**
 
 ### Nodes
@@ -171,6 +171,8 @@ Once installed, you will find the nodes under the `MiMo`, `LFM2-VL`, `Ovis2.5`, 
 
 ## Special Thanks and Links
 
+[Was-node-suite-comfyui](https://github.com/WASasquatch/was-node-suite-comfyui)
+[ComfyUI-Inspire-Pack](https://github.com/ltdrdata/ComfyUI-Inspire-Pack)
 [Visual icons created by Freepik - Flaticon](https://www.flaticon.com/free-icons/visual)
 
 ## Other examples

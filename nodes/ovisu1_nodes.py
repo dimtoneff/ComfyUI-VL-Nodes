@@ -30,7 +30,7 @@ def unload_all_ovisu1_models():
         loader.unload()
 
 
-class OvisU1ModelLoader:
+class OvisU1VLModelLoader:
     def __init__(self):
         global _ovisu1_loader_instances
         self.model = None
@@ -433,11 +433,11 @@ class OvisU1ImageCaption:
 
 
 NODE_CLASS_MAPPINGS = {
-    "OvisU1ModelLoader": OvisU1ModelLoader,
+    "OvisU1VLModelLoader": OvisU1VLModelLoader,
     "OvisU1ImageCaption": OvisU1ImageCaption,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
-    "OvisU1ModelLoader": "Load Ovis-U1 Model",
+    "OvisU1VLModelLoader": "Load Ovis-U1 VL Model",
     "OvisU1ImageCaption": "Ovis-U1 Image Caption",
 }

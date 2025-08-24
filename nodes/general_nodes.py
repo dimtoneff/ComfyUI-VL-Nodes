@@ -26,7 +26,7 @@ sort_methods = [
 ]
 
 
-class LoadImagesFromDirBatch:
+class LoadImagesFromDirBatch_VL:
     """
     Load a batch of images from a directory. Inspired from InspirePack with some modifications.
     """
@@ -150,7 +150,7 @@ class LoadImagesFromDirBatch:
             return (image1, mask1, len(images), tuple(file_paths))
 
 
-class LoadImagesFromDirList:
+class LoadImagesFromDirList_VL:
     """
     Load a batch of images from a directory. Inspired from InspirePack with some modifications.
     """
@@ -320,12 +320,12 @@ class MiMoFreeMemoryAPI:
 
 NODE_CLASS_MAPPINGS = {
     "MiMoFreeMemoryAPI": MiMoFreeMemoryAPI,
-    "LoadImagesFromDirBatch": LoadImagesFromDirBatch,
-    "LoadImagesFromDirList": LoadImagesFromDirList,
+    "LoadImagesFromDirBatch_VL": LoadImagesFromDirBatch_VL,
+    "LoadImagesFromDirList_VL": LoadImagesFromDirList_VL,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
     "MiMoFreeMemoryAPI": "Free Memory (VL Nodes)",
-    "LoadImagesFromDirBatch": "Load Images/FileNames from Dir (Batch)(VL)",
-    "LoadImagesFromDirList": "Load Images/FileNames from Dir (List)(VL)",
+    "LoadImagesFromDirBatch_VL": "Load Images From Dir (Batch) [VL]",
+    "LoadImagesFromDirList_VL": "Load Images From Dir (List) [VL]",
 }
