@@ -2,12 +2,12 @@ import os
 import re
 import torch
 import gc
-from transformers import AutoModelForCausalLM
+from transformers import AutoModelForCausalLM, set_seed
 from huggingface_hub import snapshot_download
 from torch.amp.autocast_mode import autocast
 import comfy.model_management
 import folder_paths
-from ..utils import tensor2pil, resize_pil_image, find_local_unet_models
+from ..utils import tensor2pil, resize_pil_image, find_local_unet_models, hash_seed
 
 # Create a directory for Ovis-2.5 models
 ovis25_dir = os.path.join(
@@ -185,6 +185,8 @@ class Ovis25ImageToText:
                 "ovis25_model": ("OVIS25_MODEL",),
                 "image": ("IMAGE",),
                 "prompt": ("STRING", {"default": "Describe this image in detail.", "multiline": True}),
+                "special_captioning_token": ("STRING", {"default": "", "multiline": False}),
+                "seed": ("INT", {"default": 69, "min": 1, "max": 0xffffffffffffffff}),
                 "resize_image": ("BOOLEAN", {"default": True, "label_on": "Resize Enabled", "label_off": "Resize Disabled"}),
                 "enable_thinking": ("BOOLEAN", {"default": True}),
                 "enable_thinking_budget": ("BOOLEAN", {"default": True}),
@@ -196,12 +198,13 @@ class Ovis25ImageToText:
             }
         }
 
-    RETURN_TYPES = ("STRING", "STRING")
-    RETURN_NAMES = ("text", "thinking")
+    RETURN_TYPES = ("STRING", "STRING", "STRING", "STRING")
+    RETURN_NAMES = ("text", "thinking", "text_list", "thinking_list")
+    OUTPUT_IS_LIST = (False, False, True, True)
     FUNCTION = "generate_text"
     CATEGORY = "VL-Nodes/Ovis-2.5"
 
-    def generate_text(self, ovis25_model, image, prompt, resize_image, enable_thinking, enable_thinking_budget, max_new_tokens, thinking_budget, temperature, top_p, do_sample):
+    def generate_text(self, ovis25_model, image, prompt,  special_captioning_token, seed, resize_image, enable_thinking, enable_thinking_budget, max_new_tokens, thinking_budget, temperature, top_p, do_sample):
         model_data = ovis25_model
         model = model_data["model"]
         text_tokenizer = model_data["text_tokenizer"]
@@ -221,73 +224,96 @@ class Ovis25ImageToText:
             moved_to_gpu = True
 
         current_inference_device = model.device
-        thinking_text = ""
-        final_text = ""
+
+        set_seed(hash_seed(seed))
+
+        texts = []
+        thinkings = []
 
         try:
-            pil_image = tensor2pil(image)
-            if resize_image:
-                pil_image = resize_pil_image(
-                    pil_image, target_size=512, node_name="Ovis25ImageToText")
+            pil_images = tensor2pil(image)
+            batch_size = len(pil_images)
+            print(f"Ovis-2.5 Caption: Batch size: {batch_size}")
 
-            messages = [{
-                "role": "user",
-                "content": [
-                    {"type": "image", "image": pil_image},
-                    {"type": "text", "text": prompt},
-                ],
-            }]
+            for i in range(batch_size):
+                pil_image = pil_images[i]
+                thinking_text = ""
+                final_text = ""
 
-            input_ids, pixel_values, grid_thws = model.preprocess_inputs(
-                messages=messages,
-                add_generation_prompt=True,
-                enable_thinking=enable_thinking
-            )
+                print(f"Ovis-2.5 Caption: Processing image {i+1}/{batch_size}")
 
-            input_ids = input_ids.to(device=current_inference_device)
-            pixel_values = pixel_values.to(
-                device=current_inference_device, dtype=dtype) if pixel_values is not None else None
-            grid_thws = grid_thws.to(
-                device=current_inference_device) if grid_thws is not None else None
+                try:
+                    if resize_image:
+                        pil_image = resize_pil_image(
+                            pil_image, target_size=512, node_name="Ovis25ImageToText")
 
-            do_sample_bool = do_sample.lower() == "true"
+                    messages = [{
+                        "role": "user",
+                        "content": [
+                            {"type": "image", "image": pil_image},
+                            {"type": "text", "text": prompt},
+                        ],
+                    }]
 
-            gen_kwargs = {
-                "enable_thinking": enable_thinking,
-                "enable_thinking_budget": enable_thinking_budget if enable_thinking else False,
-                "max_new_tokens": max_new_tokens,
-                "thinking_budget": thinking_budget,
-                "do_sample": do_sample_bool,
-                "top_p": top_p if do_sample_bool else None,
-                "temperature": temperature if do_sample_bool else None,
-                "eos_token_id": text_tokenizer.eos_token_id,
-                "pad_token_id": text_tokenizer.pad_token_id,
-                "use_cache": True,
-            }
+                    input_ids, pixel_values, grid_thws = model.preprocess_inputs(
+                        messages=messages,
+                        add_generation_prompt=True,
+                        enable_thinking=enable_thinking
+                    )
 
-            with torch.inference_mode(), autocast(device_type=current_inference_device.type, dtype=dtype):
-                outputs = model.generate(
-                    inputs=input_ids,
-                    pixel_values=pixel_values,
-                    grid_thws=grid_thws,
-                    **gen_kwargs
-                )
-                response = text_tokenizer.decode(
-                    outputs[0], skip_special_tokens=True)
+                    input_ids = input_ids.to(device=current_inference_device)
+                    pixel_values = pixel_values.to(
+                        device=current_inference_device, dtype=dtype) if pixel_values is not None else None
+                    grid_thws = grid_thws.to(
+                        device=current_inference_device) if grid_thws is not None else None
 
-            think_match = re.search(
-                r'<think>(.*?)</think>', response, re.DOTALL)
-            if think_match:
-                thinking_text = think_match.group(1).strip()
-                final_text = response.replace(think_match.group(0), '').strip()
-            else:
-                final_text = response.strip()
+                    do_sample_bool = do_sample.lower() == "true"
 
-        except Exception as e:
-            print(f"Error generating text with Ovis-2.5: {str(e)}")
-            import traceback
-            traceback.print_exc()
-            thinking_text = f"Error: {str(e)}"
+                    gen_kwargs = {
+                        "enable_thinking": enable_thinking,
+                        "enable_thinking_budget": enable_thinking_budget if enable_thinking else False,
+                        "max_new_tokens": max_new_tokens,
+                        "thinking_budget": thinking_budget,
+                        "do_sample": do_sample_bool,
+                        "top_p": top_p if do_sample_bool else None,
+                        "temperature": temperature if do_sample_bool else None,
+                        "eos_token_id": text_tokenizer.eos_token_id,
+                        "pad_token_id": text_tokenizer.pad_token_id,
+                        "use_cache": True,
+                    }
+
+                    with torch.inference_mode(), autocast(device_type=current_inference_device.type, dtype=dtype):
+                        outputs = model.generate(
+                            inputs=input_ids,
+                            pixel_values=pixel_values,
+                            grid_thws=grid_thws,
+                            **gen_kwargs
+                        )
+                        response = text_tokenizer.decode(
+                            outputs[0], skip_special_tokens=True)
+
+                    think_match = re.search(
+                        r'<think>(.*?)</think>', response, re.DOTALL)
+                    if think_match:
+                        thinking_text = think_match.group(1).strip()
+                        final_text = response.replace(
+                            think_match.group(0), '').strip()
+                    else:
+                        final_text = response.strip()
+
+                except Exception as e:
+                    print(f"Error generating text with Ovis-2.5: {str(e)}")
+                    import traceback
+                    traceback.print_exc()
+                    thinking_text = f"Error: {str(e)}"
+
+                if special_captioning_token and special_captioning_token.strip():
+                    final_text = f"{special_captioning_token.strip()}, {final_text}"
+
+                final_text = ' '.join(final_text.split())
+                texts.append(final_text.strip('"'))
+                thinkings.append(thinking_text)
+
         finally:
             if moved_to_gpu:
                 print(f"Ovis-2.5: Moving model back to {original_device}.")
@@ -296,7 +322,7 @@ class Ovis25ImageToText:
                 if torch.cuda.is_available():
                     torch.cuda.empty_cache()
 
-        return (final_text.strip('"'), thinking_text,)
+        return ("\n\n=============================\n\n".join(texts), "\n\n=============================\n\n".join(thinkings), tuple(texts), tuple(thinkings))
 
 
 NODE_CLASS_MAPPINGS = {

@@ -1,103 +1,9 @@
 {
   "id": "9e07843c-8f59-4563-8826-12739285ffca",
   "revision": 0,
-  "last_node_id": 33,
-  "last_link_id": 55,
+  "last_node_id": 34,
+  "last_link_id": 59,
   "nodes": [
-    {
-      "id": 14,
-      "type": "ShowText|pysssss",
-      "pos": [
-        412.00927734375,
-        432.2198181152344
-      ],
-      "size": [
-        356.79998779296875,
-        263.0909118652344
-      ],
-      "flags": {},
-      "order": 4,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "text",
-          "type": "STRING",
-          "link": 48
-        }
-      ],
-      "outputs": [
-        {
-          "name": "STRING",
-          "shape": 6,
-          "type": "STRING",
-          "links": null
-        }
-      ],
-      "title": "THINKING",
-      "properties": {
-        "cnr_id": "comfyui-custom-scripts",
-        "ver": "aac13aa7ce35b07d43633c3bbe654a38c00d74f5",
-        "Node name for S&R": "ShowText|pysssss"
-      },
-      "widgets_values": [
-        "Got it, let's describe the image for Stable Diffusion. First, the scene: two people standing on rocks by a body of water at sunset. The sky is a warm orange-yellow. There are boats on the water—one with a person, another smaller one. Mountains in the background. The overall tone is warm, with silhouettes of the people and boats. Let's structure the prompt.\n\nSo, elements: two people (silhouettes) standing on rocks by a lake or sea at sunset, warm golden light, calm water, two boats (one with a person, one small), distant mountains, orange sky, serene atmosphere. Need to make it concise for SDXL.\n\nPutting it all together: \"Two people standing on rocks by a calm body of water at sunset, warm golden light, two boats on water (one with a person, one small), distant mountains, orange sky, silhouettes, serene atmosphere\""
-      ]
-    },
-    {
-      "id": 31,
-      "type": "MiMoImageToText",
-      "pos": [
-        415.2330017089844,
-        152.91590881347656
-      ],
-      "size": [
-        314.2135314941406,
-        214.37130737304688
-      ],
-      "flags": {},
-      "order": 2,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "mimo_model",
-          "type": "MIMO_MODEL",
-          "link": 51
-        },
-        {
-          "name": "image",
-          "type": "IMAGE",
-          "link": 52
-        }
-      ],
-      "outputs": [
-        {
-          "name": "Prompt",
-          "type": "STRING",
-          "links": [
-            54
-          ]
-        },
-        {
-          "name": "Thinking",
-          "type": "STRING",
-          "links": [
-            48
-          ]
-        }
-      ],
-      "properties": {
-        "cnr_id": "comfyui-vl-nodes",
-        "ver": "8e0e876a96488dabe86f09d3696364ef74d1b52e",
-        "Node name for S&R": "MiMoImageToText",
-        "aux_id": "dimtoneff/ComfyUI-VL-Nodes"
-      },
-      "widgets_values": [
-        true,
-        "You are an assistant who perfectly describes images. Fully describe the image as a prompt for Stable Diffusion text2image SDXL model. If you see nsfw stuff describe it too. Do not omit anything! Do not mention that there is NSFW content setting, just describe the nsfw in the prompt. !Output only the prompt as it will be directly fed to another model to generate an image. Be clear and use short sentences to describe the image!",
-        "What it is on this image?",
-        128000
-      ]
-    },
     {
       "id": 12,
       "type": "LoadImage",
@@ -120,7 +26,7 @@
           "name": "IMAGE",
           "type": "IMAGE",
           "links": [
-            52
+            57
           ]
         },
         {
@@ -137,6 +43,75 @@
       "widgets_values": [
         "pexels-enesersahin-29529439.jpg",
         "image"
+      ]
+    },
+    {
+      "id": 34,
+      "type": "MiMoImageToText",
+      "pos": [
+        415.444580078125,
+        148.73709106445312
+      ],
+      "size": [
+        300.8264465332031,
+        322
+      ],
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "mimo_model",
+          "type": "MIMO_MODEL",
+          "link": 56
+        },
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "link": 57
+        }
+      ],
+      "outputs": [
+        {
+          "name": "text",
+          "type": "STRING",
+          "links": [
+            58
+          ]
+        },
+        {
+          "name": "thinking",
+          "type": "STRING",
+          "links": [
+            59
+          ]
+        },
+        {
+          "name": "text_list",
+          "shape": 6,
+          "type": "STRING",
+          "links": null
+        },
+        {
+          "name": "thinking_list",
+          "shape": 6,
+          "type": "STRING",
+          "links": null
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfyui-vl-nodes",
+        "ver": "1744cefa4de7463aa23edb0b2b94889498b1ef85",
+        "Node name for S&R": "MiMoImageToText"
+      },
+      "widgets_values": [
+        true,
+        "You are an assistant who perfectly describes images. Fully describe the image as a prompt for Stable Diffusion text2image SDXL model. If you see nsfw stuff describe it too. Do not omit anything! Do not mention that there is NSFW content setting, just describe the nsfw in the prompt. !Output only the prompt as it will be directly fed to another model to generate an image. Be clear and use short sentences to describe the image!",
+        "What it is on this image?",
+        "",
+        664413818107170,
+        "randomize",
+        128000
       ]
     },
     {
@@ -159,7 +134,7 @@
           "name": "mimo_model",
           "type": "MIMO_MODEL",
           "links": [
-            51
+            56
           ]
         }
       ],
@@ -179,11 +154,50 @@
       ]
     },
     {
+      "id": 14,
+      "type": "ShowText|pysssss",
+      "pos": [
+        421.9267578125,
+        526.104248046875
+      ],
+      "size": [
+        309.19671630859375,
+        159.2891845703125
+      ],
+      "flags": {},
+      "order": 4,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "text",
+          "type": "STRING",
+          "link": 59
+        }
+      ],
+      "outputs": [
+        {
+          "name": "STRING",
+          "shape": 6,
+          "type": "STRING",
+          "links": null
+        }
+      ],
+      "title": "THINKING",
+      "properties": {
+        "cnr_id": "comfyui-custom-scripts",
+        "ver": "aac13aa7ce35b07d43633c3bbe654a38c00d74f5",
+        "Node name for S&R": "ShowText|pysssss"
+      },
+      "widgets_values": [
+        "Got it, let's describe the image for Stable Diffusion. First, the scene: two people standing on rocks by a body of water at sunset. The sky is a warm orange-yellow. There are boats on the water—one with a person, another smaller one. Mountains in the background. The overall tone is warm, with silhouettes of the people and boats. Let's structure the prompt.\n\nSo, elements: two people (silhouettes) standing on rocks by a lake or sea at sunset, warm golden light, calm water, two boats (one with a person, one small), distant mountains, orange sky, serene atmosphere. Need to make it concise for SDXL.\n\nPutting it all together: \"Two people standing on rocks by a calm body of water at sunset, warm golden light, two boats on water (one with a person, one small), distant mountains, orange sky, silhouettes, serene atmosphere\""
+      ]
+    },
+    {
       "id": 13,
       "type": "ShowText|pysssss",
       "pos": [
-        739.6253662109375,
-        153.13951110839844
+        723.0966796875,
+        149.172607421875
       ],
       "size": [
         249.3433074951172,
@@ -221,8 +235,8 @@
       "id": 33,
       "type": "MiMoFreeMemoryAPI",
       "pos": [
-        785.6914672851562,
-        431.0513000488281
+        731.4764404296875,
+        390.05963134765625
       ],
       "size": [
         243.55372619628906,
@@ -235,7 +249,7 @@
         {
           "name": "anything",
           "type": "*",
-          "link": 54
+          "link": 58
         }
       ],
       "outputs": [
@@ -259,42 +273,42 @@
   ],
   "links": [
     [
-      48,
-      31,
-      1,
-      14,
+      55,
+      33,
+      0,
+      13,
       0,
       "STRING"
     ],
     [
-      51,
+      56,
       30,
       0,
-      31,
+      34,
       0,
       "MIMO_MODEL"
     ],
     [
-      52,
+      57,
       12,
       0,
-      31,
+      34,
       1,
       "IMAGE"
     ],
     [
-      54,
-      31,
+      58,
+      34,
       0,
       33,
       0,
       "*"
     ],
     [
-      55,
-      33,
-      0,
-      13,
+      59,
+      34,
+      1,
+      14,
       0,
       "STRING"
     ]
@@ -303,13 +317,13 @@
   "config": {},
   "extra": {
     "ds": {
-      "scale": 1.2100000000000006,
+      "scale": 1.3310000000000008,
       "offset": [
-        96.95315104792218,
-        89.44462231581996
+        62.73825483795309,
+        62.8780651516957
       ]
     },
-    "frontendVersion": "1.25.9",
+    "frontendVersion": "1.25.10",
     "VHS_latentpreview": false,
     "VHS_latentpreviewrate": 0,
     "VHS_MetadataImage": true,

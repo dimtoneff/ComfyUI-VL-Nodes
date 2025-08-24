@@ -1,5 +1,7 @@
 
 import os
+import re
+import hashlib
 import numpy as np
 from PIL import Image
 import logging
@@ -30,12 +32,67 @@ class AlwaysEqualProxy(str):
 any_type = AlwaysEqualProxy("*")
 
 
+def extract_first_number(s):
+    match = re.search(r'\d+', s)
+    return int(match.group()) if match else float('inf')
+
+
+def sort_by(items, base_path='.', method=None):
+    def fullpath(x): return os.path.join(base_path, x)
+
+    def get_timestamp(path):
+        try:
+            return os.path.getmtime(path)
+        except FileNotFoundError:
+            return float('-inf')
+
+    if method == "Alphabetical (ASC)":
+        return sorted(items)
+    elif method == "Alphabetical (DESC)":
+        return sorted(items, reverse=True)
+    elif method == "Numerical (ASC)":
+        return sorted(items, key=lambda x: extract_first_number(os.path.splitext(x)[0]))
+    elif method == "Numerical (DESC)":
+        return sorted(items, key=lambda x: extract_first_number(os.path.splitext(x)[0]), reverse=True)
+    elif method == "Datetime (ASC)":
+        return sorted(items, key=lambda x: get_timestamp(fullpath(x)))
+    elif method == "Datetime (DESC)":
+        return sorted(items, key=lambda x: get_timestamp(fullpath(x)), reverse=True)
+    else:
+        return items
+
+
+def hash_seed(seed):
+    # Convert the seed to a string and then to bytes
+    seed_bytes = str(seed).encode('utf-8')
+    # Create a SHA-256 hash of the seed bytes
+    hash_object = hashlib.sha256(seed_bytes)
+    # Convert the hash to an integer
+    hashed_seed = int(hash_object.hexdigest(), 16)
+    # Ensure the hashed seed is within the acceptable range for set_seed
+    return hashed_seed % (2 ** 32)
+
+
 def tensor2pil(image):
     if image.dim() == 4:
-        image = image.squeeze(0)
-    image = image.cpu().numpy()
-    image = (image * 255).astype(np.uint8)
-    return Image.fromarray(image)
+        # Batch of images
+        print(
+            f"Converting batch of images to PIL format. Count: {image.shape[0]}")
+        images = []
+        for i in range(image.shape[0]):
+            img_tensor = image[i]
+            img_np = img_tensor.cpu().numpy()
+            img_np = (img_np * 255).astype(np.uint8)
+            images.append(Image.fromarray(img_np))
+            print(f"Converted image {i+1}/{image.shape[0]}")
+        return images
+    elif image.dim() == 3:
+        # Single image
+        image = image.cpu().numpy()
+        image = (image * 255).astype(np.uint8)
+        return [Image.fromarray(image)]
+    else:
+        raise ValueError(f"Unsupported image tensor dimensions: {image.dim()}")
 
 
 def resize_pil_image(pil_image, target_size=512, node_name="Node"):

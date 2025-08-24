@@ -1,8 +1,8 @@
 {
   "id": "bb0099a8-b11a-4af6-a46b-a00220b1ae5d",
   "revision": 0,
-  "last_node_id": 12,
-  "last_link_id": 19,
+  "last_node_id": 13,
+  "last_link_id": 23,
   "nodes": [
     {
       "id": 6,
@@ -22,7 +22,7 @@
         {
           "name": "anything",
           "type": "*",
-          "link": 18
+          "link": 21
         }
       ],
       "outputs": [
@@ -63,7 +63,7 @@
           "name": "IMAGE",
           "type": "IMAGE",
           "links": [
-            16
+            20
           ]
         },
         {
@@ -83,15 +83,92 @@
       ]
     },
     {
+      "id": 13,
+      "type": "KeyeNode",
+      "pos": [
+        478.70782470703125,
+        194.60276794433594
+      ],
+      "size": [
+        343.8016662597656,
+        484
+      ],
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "keye_model",
+          "type": "KEYE_MODEL",
+          "link": 23
+        },
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "link": 20
+        }
+      ],
+      "outputs": [
+        {
+          "name": "text",
+          "type": "STRING",
+          "links": [
+            21
+          ]
+        },
+        {
+          "name": "thinking",
+          "type": "STRING",
+          "links": [
+            22
+          ]
+        },
+        {
+          "name": "text_list",
+          "shape": 6,
+          "type": "STRING",
+          "links": null
+        },
+        {
+          "name": "thinking_list",
+          "shape": 6,
+          "type": "STRING",
+          "links": null
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfyui-vl-nodes",
+        "ver": "1744cefa4de7463aa23edb0b2b94889498b1ef85",
+        "Node name for S&R": "KeyeNode"
+      },
+      "widgets_values": [
+        "You are an assistant who perfectly describes images. Fully describe the image as a prompt for Stable Diffusion text2image SDXL model. If you see nsfw stuff describe it too. Do not omit anything! Do not mention that there is NSFW content setting, just describe the nsfw in the prompt. !Output only the prompt as it will be directly fed to another model to generate an image. Be clear and use short sentences to describe the image! Return only the prompt without saying \"Prompt\"",
+        "",
+        "Thinking",
+        "Exact Dimensions",
+        "cuda",
+        1024,
+        0.7,
+        0.9,
+        "false",
+        1120488430636752,
+        "randomize",
+        200704,
+        1003520,
+        512,
+        0
+      ]
+    },
+    {
       "id": 4,
       "type": "ShowText|pysssss",
       "pos": [
-        467.1073913574219,
-        649.169921875
+        477.6857604980469,
+        723.880615234375
       ],
       "size": [
-        385.54107666015625,
-        232.0886688232422
+        345.8715515136719,
+        143.49356079101562
       ],
       "flags": {},
       "order": 5,
@@ -125,12 +202,12 @@
       "id": 12,
       "type": "ShowText|pysssss",
       "pos": [
-        465.0640563964844,
-        917.8933715820312
+        478.2872009277344,
+        908.6373901367188
       ],
       "size": [
-        387.0323486328125,
-        251.9955291748047
+        348.6852111816406,
+        229.5162353515625
       ],
       "flags": {},
       "order": 4,
@@ -139,7 +216,7 @@
         {
           "name": "text",
           "type": "STRING",
-          "link": 19
+          "link": 22
         }
       ],
       "outputs": [
@@ -158,70 +235,6 @@
       },
       "widgets_values": [
         "The user now needs to describe the image content in detail, including elements such as the pixel art style, cruise ship, sunset, mountains, and water. First, analyze the image: it is a pixel art style image featuring a large cruise ship on the water, with a sunset in the background, mountains, and clouds. The color palette includes orange, green, blue, and white. The scene is a sunset by the sea, with the cruise ship docked or sailing, surrounded by mountains and clouds, with the sun near the horizon.\n\nNow organize the description: Pixel art style, large cruise ship, calm water, sunset, orange-red sky, clouds, green mountains, details of the cruise ship (windows, deck, structure), pixelated texture, warm color tones, serene atmosphere, dock or seaside, reflections on the water, distant mountains, setting sun.\n\nEnsure all elements are included, and the description is clear and concise, without omitting details."
-      ]
-    },
-    {
-      "id": 11,
-      "type": "KeyeNode",
-      "pos": [
-        469.27166748046875,
-        192.42384338378906
-      ],
-      "size": [
-        383.7716064453125,
-        421.20208740234375
-      ],
-      "flags": {},
-      "order": 2,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "keye_model",
-          "type": "KEYE_MODEL",
-          "link": 17
-        },
-        {
-          "name": "image",
-          "type": "IMAGE",
-          "link": 16
-        }
-      ],
-      "outputs": [
-        {
-          "name": "description",
-          "type": "STRING",
-          "links": [
-            18
-          ]
-        },
-        {
-          "name": "thinking_analysis",
-          "type": "STRING",
-          "links": [
-            19
-          ]
-        }
-      ],
-      "properties": {
-        "cnr_id": "comfyui-vl-nodes",
-        "ver": "3fc0fb43170dba5b20caeec61508d81c99e974ad",
-        "Node name for S&R": "KeyeNode"
-      },
-      "widgets_values": [
-        "You are an assistant who perfectly describes images. Fully describe the image as a prompt for Stable Diffusion text2image SDXL model. If you see nsfw stuff describe it too. Do not omit anything! Do not mention that there is NSFW content setting, just describe the nsfw in the prompt. !Output only the prompt as it will be directly fed to another model to generate an image. Be clear and use short sentences to describe the image! Return only the prompt without saying \"Prompt\"",
-        "Thinking",
-        "Exact Dimensions",
-        "cuda",
-        512,
-        0.1,
-        0.9,
-        "false",
-        72891686296218,
-        "randomize",
-        200704,
-        1003520,
-        512,
-        0
       ]
     },
     {
@@ -244,7 +257,7 @@
           "name": "keye_model",
           "type": "KEYE_MODEL",
           "links": [
-            17
+            23
           ]
         }
       ],
@@ -275,36 +288,36 @@
       "STRING"
     ],
     [
-      16,
+      20,
       3,
       0,
-      11,
+      13,
       1,
       "IMAGE"
     ],
     [
-      17,
-      10,
-      0,
-      11,
-      0,
-      "KEYE_MODEL"
-    ],
-    [
-      18,
-      11,
+      21,
+      13,
       0,
       6,
       0,
       "*"
     ],
     [
-      19,
-      11,
+      22,
+      13,
       1,
       12,
       0,
       "STRING"
+    ],
+    [
+      23,
+      10,
+      0,
+      13,
+      0,
+      "KEYE_MODEL"
     ]
   ],
   "groups": [],
@@ -313,11 +326,11 @@
     "ds": {
       "scale": 1.2100000000000006,
       "offset": [
-        -0.030415501297334835,
-        -74.10665723885236
+        157.3249765764402,
+        -66.17289400279863
       ]
     },
-    "frontendVersion": "1.25.9",
+    "frontendVersion": "1.25.10",
     "VHS_latentpreview": false,
     "VHS_latentpreviewrate": 0,
     "VHS_MetadataImage": true,

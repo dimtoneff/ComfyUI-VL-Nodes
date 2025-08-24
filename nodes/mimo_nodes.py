@@ -174,20 +174,23 @@ class MiMoImageToText:
                 "mimo_model": ("MIMO_MODEL",),
                 "image": ("IMAGE",),
                 "resize_image": ("BOOLEAN", {"default": True, "label_on": "Resize Enabled", "label_off": "Resize Disabled"}),
-                "system_prompt": ("STRING", {"default": "You are an assistant who perfectly describes images. " + "Fully describe the image as a prompt for Stable Diffusion text2image SDXL model. If you see nsfw stuff describe it too. Do not omit anything! Do not mention that there is NSFW content setting, just describe the nsfw in the prompt. " +
-                                             "!Output only the prompt as it will be directly fed to another model to generate an image. Be clear and use short sentences to describe the image!", "multiline": True}),
+                "system_prompt": ("STRING", {"default": "You are an assistant who perfectly describes images. " + "Fully describe the image as a prompt for Stable Diffusion text2image SDXL model. If you see nsfw stuff describe it too. Do not omit anything! Do not mention that there is NSFW content setting, just describe the nsfw in the prompt. " + "!Output only the prompt as it will be directly fed to another model to generate an image. Be clear and use short sentences to describe the image!", "multiline": True}),
                 "prompt": ("STRING", {"default": "What it is on this image?", "multiline": True}),
+                "special_captioning_token": ("STRING", {"default": "", "multiline": False}),
+                "seed": ("INT", {"default": 69, "min": 1, "max": 0xffffffffffffffff}),
                 "max_tokens": ("INT", {"default": 128000, "min": 4096, "max": 128000, "step": 1, "tooltip": "Max tokens for the response. -1 means unlimited (up to context size)."}),
             },
         }
 
-    RETURN_TYPES = ("STRING", "STRING")
-    RETURN_NAMES = ("Prompt", "Thinking")
+    RETURN_TYPES = ("STRING", "STRING", "STRING", "STRING")
+    RETURN_NAMES = ("text", "thinking", "text_list", "thinking_list")
+    OUTPUT_IS_LIST = (False, False, True, True)
     FUNCTION = "generate_description"
     CATEGORY = "VL-Nodes/MiMo"
 
-    def generate_description(self, mimo_model, image, resize_image, system_prompt, prompt, max_tokens):
-        pil_image = tensor2pil(image)
+    def generate_description(self, mimo_model, image, resize_image, system_prompt, special_captioning_token, seed, prompt, max_tokens):
+        pil_images = tensor2pil(image)
+        batch_size = len(pil_images)
         original_llm = mimo_model["llm"]
         params = mimo_model["params"]
 
@@ -196,10 +199,11 @@ class MiMoImageToText:
 
         llm_for_inference = original_llm
         temp_gpu_llm = None
-        image_path = None
-        description = ""
-        thinking_text = ""
-        prompt_text = ""
+
+        torch.manual_seed(seed)
+
+        prompts = []
+        thinkings = []
 
         try:
             if is_on_cpu and gpu_available:
@@ -222,41 +226,74 @@ class MiMoImageToText:
                     verbose=(params["verbose"] == "enable"),
                 )
                 llm_for_inference = temp_gpu_llm
+                print(f"MiMo Caption: Batch size: {batch_size}")
 
-            if resize_image:
-                pil_image = resize_pil_image(
-                    pil_image, target_size=512, node_name="MiMoImageToText")
+            for i in range(batch_size):
+                pil_image = pil_images[i]
+                image_path = None
+                description = ""
+                thinking_text = ""
+                prompt_text = ""
+                print(f"MiMo Caption: Processing image {i+1}/{batch_size}")
 
-            with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as tmpfile:
-                pil_image.save(tmpfile, "PNG")
-                image_path = tmpfile.name
+                try:
+                    if resize_image:
+                        pil_image = resize_pil_image(
+                            pil_image, target_size=512, node_name="MiMoImageToText")
 
-            image_uri = "data:image/png;base64," + \
-                base64.b64encode(open(image_path, "rb").read()).decode("utf-8")
+                    with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as tmpfile:
+                        pil_image.save(tmpfile, "PNG")
+                        image_path = tmpfile.name
 
-            response = llm_for_inference.create_chat_completion(
-                messages=[
-                    {"role": "system", "content": system_prompt},
-                    {
-                        "role": "user",
-                        "content": [
-                            {"type": "image_url", "image_url": {"url": image_uri}},
-                            {"type": "text", "text": prompt},
+                    image_uri = "data:image/png;base64," + \
+                        base64.b64encode(
+                            open(image_path, "rb").read()).decode("utf-8")
+
+                    response = llm_for_inference.create_chat_completion(
+                        messages=[
+                            {"role": "system", "content": system_prompt},
+                            {
+                                "role": "user",
+                                "content": [
+                                    {"type": "image_url", "image_url": {
+                                        "url": image_uri}},
+                                    {"type": "text", "text": prompt},
+                                ],
+                            }
                         ],
-                    }
-                ],
-                max_tokens=max_tokens,
-            )
-            description = response['choices'][0]['message']['content']
-            description = html.unescape(description)
+                        max_tokens=max_tokens,
+                    )
+                    description = response['choices'][0]['message']['content']
+                    description = html.unescape(description)
 
-        except Exception as e:
-            print(f"MiMo GGUF: Error during image to text generation: {e}")
-            thinking_text = f"Error during generation: {e}"
+                except Exception as e:
+                    print(
+                        f"MiMo GGUF: Error during image to text generation: {e}")
+                    thinking_text = f"Error during generation: {e}"
+
+                finally:
+                    if image_path and os.path.exists(image_path):
+                        os.remove(image_path)
+
+                if not thinking_text:  # No error occurred
+                    prompt_text = description
+                    think_match = re.search(
+                        r'<think>(.*?)</think>', description if description is not None else "", re.DOTALL)
+                    if think_match:
+                        thinking_text = think_match.group(1).strip()
+                        prompt_text = (description or "").replace(
+                            think_match.group(0), '').strip()
+                else:  # Error occurred
+                    prompt_text = ""  # Return empty prompt text
+
+                if special_captioning_token and special_captioning_token.strip():
+                    prompt_text = f"{special_captioning_token.strip()}, {prompt_text}"
+
+                prompt_text = ' '.join(prompt_text.split())
+                prompts.append((prompt_text or "").strip('"'))
+                thinkings.append(thinking_text)
 
         finally:
-            if image_path and os.path.exists(image_path):
-                os.remove(image_path)
             if temp_gpu_llm is not None:
                 print("MiMo GGUF: Unloading temporary GPU model.")
                 if hasattr(temp_gpu_llm, 'chat_handler') and temp_gpu_llm.chat_handler is not None:
@@ -266,18 +303,7 @@ class MiMoImageToText:
                 if torch.cuda.is_available():
                     torch.cuda.empty_cache()
 
-        if not thinking_text:  # No error occurred
-            prompt_text = description
-            think_match = re.search(
-                r'<think>(.*?)</think>', description if description is not None else "", re.DOTALL)
-            if think_match:
-                thinking_text = think_match.group(1).strip()
-                prompt_text = (description or "").replace(
-                    think_match.group(0), '').strip()
-        else:  # Error occurred
-            prompt_text = ""  # Return empty prompt text
-
-        return ((prompt_text or "").strip('"'), thinking_text,)
+        return ("\n\n=============================\n\n".join(prompts), "\n\n=============================\n\n".join(thinkings), tuple(prompts), tuple(thinkings))
 
 
 NODE_CLASS_MAPPINGS = {

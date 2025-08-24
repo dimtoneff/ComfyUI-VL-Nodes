@@ -1,8 +1,8 @@
 {
   "id": "bb0099a8-b11a-4af6-a46b-a00220b1ae5d",
   "revision": 0,
-  "last_node_id": 6,
-  "last_link_id": 8,
+  "last_node_id": 7,
+  "last_link_id": 11,
   "nodes": [
     {
       "id": 3,
@@ -24,7 +24,7 @@
           "name": "IMAGE",
           "type": "IMAGE",
           "links": [
-            2
+            10
           ]
         },
         {
@@ -44,15 +44,54 @@
       ]
     },
     {
-      "id": 1,
-      "type": "OvisU1ImageCaption",
+      "id": 6,
+      "type": "MiMoFreeMemoryAPI",
       "pos": [
-        464,
-        321
+        516.7999877929688,
+        223.40005493164062
       ],
       "size": [
-        400,
-        228
+        270,
+        58
+      ],
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "anything",
+          "type": "*",
+          "link": 11
+        }
+      ],
+      "outputs": [
+        {
+          "name": "output",
+          "type": "*",
+          "links": [
+            8
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfyui-vl-nodes",
+        "ver": "6ab7af32e11476b93ee4c8f99488c3f648c838b0",
+        "Node name for S&R": "MiMoFreeMemoryAPI"
+      },
+      "widgets_values": [
+        false
+      ]
+    },
+    {
+      "id": 7,
+      "type": "OvisU1ImageCaption",
+      "pos": [
+        470.39990234375,
+        323.4000244140625
+      ],
+      "size": [
+        349.5999755859375,
+        313.60003662109375
       ],
       "flags": {},
       "order": 2,
@@ -61,35 +100,43 @@
         {
           "name": "model",
           "type": "OVIS_U1_MODEL",
-          "link": 1
+          "link": 9
         },
         {
           "name": "image",
           "type": "IMAGE",
-          "link": 2
+          "link": 10
         }
       ],
       "outputs": [
         {
-          "name": "string",
+          "name": "text",
           "type": "STRING",
           "links": [
-            7
+            11
           ]
+        },
+        {
+          "name": "text_list",
+          "shape": 6,
+          "type": "STRING",
+          "links": null
         }
       ],
       "properties": {
         "cnr_id": "comfyui-vl-nodes",
-        "ver": "8e0e876a96488dabe86f09d3696364ef74d1b52e",
-        "Node name for S&R": "OvisU1ImageCaption",
-        "aux_id": "dimtoneff/ComfyUI-VL-Nodes"
+        "ver": "1744cefa4de7463aa23edb0b2b94889498b1ef85",
+        "Node name for S&R": "OvisU1ImageCaption"
       },
       "widgets_values": [
         true,
         "You are an assistant who perfectly describes images. Fully describe the image as a prompt for Stable Diffusion text2image SDXL model. If you see nsfw stuff describe it too. Do not omit anything! Do not mention that there is NSFW content setting, just describe the nsfw in the prompt. !Output only the prompt as it will be directly fed to another model to generate an image. Be clear and use short sentences to describe the image!",
-        75,
-        0.4,
-        0.9,
+        "",
+        242215985471398,
+        "randomize",
+        512,
+        0.5,
+        0.91,
         "false"
       ]
     },
@@ -98,11 +145,11 @@
       "type": "ShowText|pysssss",
       "pos": [
         468,
-        590.5999755859375
+        684.9999389648438
       ],
       "size": [
-        396.00006103515625,
-        242.00006103515625
+        351.20001220703125,
+        145.2001953125
       ],
       "flags": {},
       "order": 4,
@@ -128,46 +175,7 @@
         "Node name for S&R": "ShowText|pysssss"
       },
       "widgets_values": [
-        "A serene sunset scene by the water, featuring two silhouetted figures standing on rocks, gazing at the horizon. The sky is painted in warm hues of orange and yellow, reflecting on the calm water. In the distance, two small boats with people are visible, adding a sense of tranquility and companionship to the image. The silhouette of distant mountains completes the"
-      ]
-    },
-    {
-      "id": 6,
-      "type": "MiMoFreeMemoryAPI",
-      "pos": [
-        530.4000244140625,
-        218.60006713867188
-      ],
-      "size": [
-        270,
-        58
-      ],
-      "flags": {},
-      "order": 3,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "anything",
-          "type": "*",
-          "link": 7
-        }
-      ],
-      "outputs": [
-        {
-          "name": "output",
-          "type": "*",
-          "links": [
-            8
-          ]
-        }
-      ],
-      "properties": {
-        "cnr_id": "comfyui-vl-nodes",
-        "ver": "6ab7af32e11476b93ee4c8f99488c3f648c838b0",
-        "Node name for S&R": "MiMoFreeMemoryAPI"
-      },
-      "widgets_values": [
-        false
+        "A serene sunset scene by the sea, with two silhouetted figures standing on rocks, gazing out at the water. The sky is a warm golden hue, reflecting on the calm sea. In the distance, two small boats with people are visible, adding a sense of tranquility and companionship to the image. The distant mountains create a picturesque backdrop, enhancing the peaceful atmosphere."
       ]
     },
     {
@@ -190,7 +198,7 @@
           "name": "model",
           "type": "OVIS_U1_MODEL",
           "links": [
-            1
+            9
           ]
         }
       ],
@@ -211,49 +219,49 @@
   ],
   "links": [
     [
-      1,
-      2,
-      0,
-      1,
-      0,
-      "OVIS_U1_MODEL"
-    ],
-    [
-      2,
-      3,
-      0,
-      1,
-      1,
-      "IMAGE"
-    ],
-    [
-      7,
-      1,
-      0,
-      6,
-      0,
-      "*"
-    ],
-    [
       8,
       6,
       0,
       4,
       0,
       "STRING"
+    ],
+    [
+      9,
+      2,
+      0,
+      7,
+      0,
+      "OVIS_U1_MODEL"
+    ],
+    [
+      10,
+      3,
+      0,
+      7,
+      1,
+      "IMAGE"
+    ],
+    [
+      11,
+      7,
+      0,
+      6,
+      0,
+      "*"
     ]
   ],
   "groups": [],
   "config": {},
   "extra": {
     "ds": {
-      "scale": 1,
+      "scale": 1.3310000000000004,
       "offset": [
-        169.5999755859375,
-        27.199996948242188
+        56.53500950882766,
+        -68.09483422237095
       ]
     },
-    "frontendVersion": "1.25.9",
+    "frontendVersion": "1.25.10",
     "VHS_latentpreview": false,
     "VHS_latentpreviewrate": 0,
     "VHS_MetadataImage": true,

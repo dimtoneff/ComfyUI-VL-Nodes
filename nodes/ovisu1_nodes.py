@@ -2,14 +2,14 @@
 import os
 import torch
 import gc
-from transformers import AutoModelForCausalLM, AutoTokenizer
+from transformers import AutoModelForCausalLM, AutoTokenizer, set_seed
 from transformers.models.auto.configuration_auto import CONFIG_MAPPING
 from transformers.utils.quantization_config import BitsAndBytesConfig
 from huggingface_hub import snapshot_download
 from torch.amp.autocast_mode import autocast
 import comfy.model_management
 import folder_paths
-from ..utils import tensor2pil, resize_pil_image, find_local_unet_models
+from ..utils import tensor2pil, resize_pil_image, find_local_unet_models, hash_seed
 
 # Create a directory for Ovis-U1 models
 ovis_u1_dir = os.path.join(
@@ -297,6 +297,8 @@ class OvisU1ImageCaption:
                 "image": ("IMAGE",),
                 "resize_image": ("BOOLEAN", {"default": True, "label_on": "Resize Enabled", "label_off": "Resize Disabled"}),
                 "prompt": ("STRING", {"default": "Describe this image in detail.", "multiline": True}),
+                "special_captioning_token": ("STRING", {"default": "", "multiline": False}),
+                "seed": ("INT", {"default": 69, "min": 1, "max": 0xffffffffffffffff}),
                 "max_new_tokens": ("INT", {"default": 75, "min": 64, "max": 4096}),
                 "temperature": ("FLOAT", {"default": 0.7, "min": 0.0, "max": 1.0, "step": 0.1}),
                 "top_p": ("FLOAT", {"default": 0.9, "min": 0.1, "max": 1.0, "step": 0.01}),
@@ -304,12 +306,13 @@ class OvisU1ImageCaption:
             }
         }
 
-    RETURN_TYPES = ("STRING",)
-    RETURN_NAMES = ("string",)
+    RETURN_TYPES = ("STRING", "STRING")
+    RETURN_NAMES = ("text", "text_list")
+    OUTPUT_IS_LIST = (False, True)
     FUNCTION = "generate_caption"
     CATEGORY = "VL-Nodes/Ovis-U1"
 
-    def generate_caption(self, model, image, resize_image, prompt, max_new_tokens, temperature, top_p, do_sample):
+    def generate_caption(self, model, image, resize_image, prompt, special_captioning_token, seed, max_new_tokens, temperature, top_p, do_sample):
         model_data = model
         model = model_data["model"]
         text_tokenizer = model_data["text_tokenizer"]
@@ -343,64 +346,79 @@ class OvisU1ImageCaption:
         # The actual device for inference is where the model is now
         current_inference_device = model.device
 
+        set_seed(hash_seed(seed))
+
+        captions = []
         try:
-            pil_image = tensor2pil(image)
+            pil_images = tensor2pil(image)
+            batch_size = len(pil_images)
+            print(f"Ovis-U1 Caption: Batch size: {batch_size}")
 
-            if resize_image:
-                pil_image = resize_pil_image(
-                    pil_image, target_size=512, node_name="OvisU1ImageCaption")
+            for i in range(batch_size):
+                pil_image = pil_images[i]
+                print(f"Ovis-U1 Caption: Processing image {i+1}/{batch_size}")
+                try:
+                    if resize_image:
+                        pil_image = resize_pil_image(
+                            pil_image, target_size=512, node_name="OvisU1ImageCaption")
 
-            query = f"<image>\n{prompt}"
+                    query = f"<image>{prompt}"
 
-            # Preprocess inputs
-            _, input_ids, pixel_values, grid_thws = model.preprocess_inputs(
-                query,
-                [pil_image],
-                generation_preface='',
-                return_labels=False,
-                propagate_exception=False,
-                multimodal_type='single_image',
-                fix_sample_overall_length_navit=False
-            )
-            attention_mask = torch.ne(input_ids, text_tokenizer.pad_token_id)
+                    # Preprocess inputs
+                    _, input_ids, pixel_values, grid_thws = model.preprocess_inputs(
+                        query,
+                        [pil_image],
+                        generation_preface='',
+                        return_labels=False,
+                        propagate_exception=False,
+                        multimodal_type='single_image',
+                        fix_sample_overall_length_navit=False
+                    )
+                    attention_mask = torch.ne(
+                        input_ids, text_tokenizer.pad_token_id)
 
-            # Move inputs to the correct device for inference
-            input_ids = input_ids.unsqueeze(0).to(
-                device=current_inference_device)
-            attention_mask = attention_mask.unsqueeze(
-                0).to(device=current_inference_device)
+                    # Move inputs to the correct device for inference
+                    input_ids = input_ids.unsqueeze(0).to(
+                        device=current_inference_device)
+                    attention_mask = attention_mask.unsqueeze(
+                        0).to(device=current_inference_device)
 
-            if pixel_values is not None:
-                pixel_values = pixel_values.to(
-                    device=current_inference_device, dtype=dtype)
-            if grid_thws is not None:
-                grid_thws = grid_thws.to(device=current_inference_device)
+                    if pixel_values is not None:
+                        pixel_values = pixel_values.to(
+                            device=current_inference_device, dtype=dtype)
+                    if grid_thws is not None:
+                        grid_thws = grid_thws.to(
+                            device=current_inference_device)
 
-            do_sample_bool = do_sample.lower() == "true"
+                    do_sample_bool = do_sample.lower() == "true"
 
-            gen_kwargs = {
-                "max_new_tokens": max_new_tokens,
-                "do_sample": do_sample_bool,
-                "top_p": top_p if do_sample_bool else None,
-                "temperature": temperature if do_sample_bool else None,
-                "eos_token_id": text_tokenizer.eos_token_id,
-                "pad_token_id": text_tokenizer.pad_token_id,
-                "use_cache": True,
-            }
+                    gen_kwargs = {
+                        "max_new_tokens": max_new_tokens,
+                        "do_sample": do_sample_bool,
+                        "top_p": top_p if do_sample_bool else None,
+                        "temperature": temperature if do_sample_bool else None,
+                        "eos_token_id": text_tokenizer.eos_token_id,
+                        "pad_token_id": text_tokenizer.pad_token_id,
+                        "use_cache": True,
+                    }
 
-            # Use autocast for mixed-precision
-            with torch.inference_mode(), autocast(device_type=current_inference_device.type, dtype=dtype):
-                output_ids = model.generate(input_ids, pixel_values=pixel_values,
-                                            attention_mask=attention_mask, grid_thws=grid_thws, **gen_kwargs)[0]
-                gen_text = text_tokenizer.decode(
-                    output_ids, skip_special_tokens=True)
+                    # Use autocast for mixed-precision
+                    with torch.inference_mode(), autocast(device_type=current_inference_device.type, dtype=dtype):
+                        output_ids = model.generate(input_ids, pixel_values=pixel_values,
+                                                    attention_mask=attention_mask, grid_thws=grid_thws, **gen_kwargs)[0]
+                        gen_text = text_tokenizer.decode(
+                            output_ids, skip_special_tokens=True)
 
-            return (gen_text.strip().strip('"'),)
-        except Exception as e:
-            print(f"Error generating caption: {str(e)}")
-            import traceback
-            traceback.print_exc()
-            return (f"Error generating caption: {str(e)}",)
+                    if special_captioning_token and special_captioning_token.strip():
+                        gen_text = f"{special_captioning_token.strip()}, {gen_text}"
+
+                    gen_text = ' '.join(gen_text.split())
+                    captions.append(gen_text.strip().strip('"'))
+                except Exception as e:
+                    print(f"Error generating caption for image {i}: {str(e)}")
+                    import traceback
+                    traceback.print_exc()
+                    captions.append(f"Error generating caption: {str(e)}")
         finally:
             # Move model back to CPU if we moved it
             if moved_to_gpu:
@@ -410,6 +428,8 @@ class OvisU1ImageCaption:
                 gc.collect()
                 if torch.cuda.is_available():
                     torch.cuda.empty_cache()
+
+        return ("\n\n=============================\n\n".join(captions), tuple(captions))
 
 
 NODE_CLASS_MAPPINGS = {

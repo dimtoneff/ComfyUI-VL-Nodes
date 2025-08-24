@@ -2,11 +2,11 @@ import os
 import gc
 import torch
 from huggingface_hub import snapshot_download
-from transformers import AutoModelForImageTextToText, AutoProcessor
+from transformers import AutoModelForImageTextToText, AutoProcessor, set_seed
 from transformers.utils.quantization_config import BitsAndBytesConfig
 import folder_paths
 from torch.amp.autocast_mode import autocast
-from ..utils import tensor2pil, find_local_unet_models
+from ..utils import tensor2pil, find_local_unet_models, hash_seed
 
 # Global registry for LFM2 loaders
 # _lfm2_gguf_loader_instances = []
@@ -198,6 +198,8 @@ class LFM2TransformerImageToText:
                 "lfm2_hf_model": ("LFM2_HF_MODEL",),
                 "image": ("IMAGE",),
                 "prompt": ("STRING", {"default": "Describe this image.", "multiline": True}),
+                "special_captioning_token": ("STRING", {"default": "", "multiline": False}),
+                "seed": ("INT", {"default": 69, "min": 1, "max": 0xffffffffffffffff}),
                 "max_new_tokens": ("INT", {"default": 75, "min": 64, "max": 4096}),
                 "temperature": ("FLOAT", {"default": 0.1, "min": 0.0, "max": 1.0, "step": 0.1}),
                 "min_p": ("FLOAT", {"default": 0.15, "min": 0.0, "max": 1.0, "step": 0.01}),
@@ -205,12 +207,13 @@ class LFM2TransformerImageToText:
             }
         }
 
-    RETURN_TYPES = ("STRING",)
-    RETURN_NAMES = ("text",)
+    RETURN_TYPES = ("STRING", "STRING")
+    RETURN_NAMES = ("text", "text_list")
+    OUTPUT_IS_LIST = (False, True)
     FUNCTION = "generate_text"
     CATEGORY = "VL-Nodes/LFM2-VL"
 
-    def generate_text(self, lfm2_hf_model, image, prompt, max_new_tokens, temperature, min_p, repetition_penalty):
+    def generate_text(self, lfm2_hf_model, image, prompt, special_captioning_token, seed, max_new_tokens, temperature, min_p, repetition_penalty):
         model = lfm2_hf_model["model"]
         processor = lfm2_hf_model["processor"]
         target_device_str = 'cuda' if torch.cuda.is_available() else 'cpu'
@@ -226,38 +229,70 @@ class LFM2TransformerImageToText:
                 f"LFM2 HF: Moving model from {original_device} to {target_device} for inference.")
             model.to(target_device)
 
+        set_seed(hash_seed(seed))
+
         try:
-            pil_image = tensor2pil(image)
+            pil_images = tensor2pil(image)
+            batch_size = len(pil_images)
+            print(f"LFM2 HF: Batch size: {batch_size}")
+            results = []
 
-            conversation = [
-                {
-                    "role": "user",
-                    "content": [
-                        {"type": "image", "image": pil_image},
-                        {"type": "text", "text": prompt},
-                    ],
-                },
-            ]
+            for i in range(batch_size):
+                pil_image = pil_images[i]
+                print(f"LFM2 HF: Processing image {i+1}/{batch_size}")
+                conversation = [
+                    {
+                        "role": "user",
+                        "content": [
+                            {"type": "image", "image": pil_image},
+                            {"type": "text", "text": prompt},
+                        ],
+                    },
+                ]
 
-            with torch.inference_mode(), autocast(device_type=target_device.type, dtype=dtype):
-                inputs = processor.apply_chat_template(
-                    conversation,
-                    add_generation_prompt=True,
-                    return_tensors="pt",
-                    return_dict=True,
-                    tokenize=True,
-                ).to(target_device)
+                with torch.inference_mode(), autocast(device_type=target_device.type, dtype=dtype):
+                    inputs = processor.apply_chat_template(
+                        conversation,
+                        add_generation_prompt=True,
+                        return_tensors="pt",
+                        return_dict=True,
+                        tokenize=True,
+                    ).to(target_device)
 
-                outputs = model.generate(
-                    **inputs,
-                    max_new_tokens=max_new_tokens,
-                    temperature=temperature,
-                    min_p=min_p,
-                    repetition_penalty=repetition_penalty,
-                    do_sample=True if temperature > 0 else False
-                )
-                result = processor.batch_decode(
-                    outputs, skip_special_tokens=True)[0]
+                    outputs = model.generate(
+                        **inputs,
+                        max_new_tokens=max_new_tokens,
+                        temperature=temperature,
+                        min_p=min_p,
+                        repetition_penalty=repetition_penalty,
+                        do_sample=True if temperature > 0 else False
+                    )
+                    result = processor.batch_decode(
+                        outputs, skip_special_tokens=True)[0]
+
+                # Handle different assistant markers
+                possible_markers = ["<|im_start|>assistant\n", "assistant\n"]
+                final_text = result.strip()
+
+                for marker in possible_markers:
+                    last_occurrence = result.rfind(marker)
+                    if last_occurrence != -1:
+                        final_text = result[last_occurrence +
+                                            len(marker):].strip()
+                        # Remove <|im_end|> if it exists
+                        if final_text.endswith("<|im_end|>"):
+                            final_text = final_text[:-
+                                                    len("<|im_end|>")].strip()
+                        break
+
+                if "assistant" in final_text:
+                    final_text = final_text.split("assistant")[-1].strip()
+
+                if special_captioning_token and special_captioning_token.strip():
+                    final_text = f"{special_captioning_token.strip()}, {final_text}"
+
+                final_text = ' '.join(final_text.split())
+                results.append(final_text.strip('"'))
         finally:
             if move_model:
                 print(f"LFM2 HF: Moving model back to {original_device}.")
@@ -266,23 +301,7 @@ class LFM2TransformerImageToText:
                 if torch.cuda.is_available():
                     torch.cuda.empty_cache()
 
-        # Handle different assistant markers
-        possible_markers = ["<|im_start|>assistant\n", "assistant\n"]
-        final_text = result.strip()
-
-        for marker in possible_markers:
-            last_occurrence = result.rfind(marker)
-            if last_occurrence != -1:
-                final_text = result[last_occurrence + len(marker):].strip()
-                # Remove <|im_end|> if it exists
-                if final_text.endswith("<|im_end|>"):
-                    final_text = final_text[:-len("<|im_end|>")].strip()
-                break  # Marker found, no need to check others
-
-        if "assistant" in final_text:
-            final_text = final_text.split("assistant")[-1].strip()
-
-        return (final_text.strip('"'),)
+        return ("\n\n=============================\n\n".join(results), tuple(results))
 
 # --- GGUF Nodes ---
 # Loader works with latest llama.cpp but the inference did not work properly.

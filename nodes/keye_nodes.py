@@ -1,12 +1,12 @@
 import os
 import gc
 import torch
-from transformers import AutoModel, AutoProcessor
+from transformers import AutoModel, AutoProcessor, set_seed
 from transformers.utils.quantization_config import BitsAndBytesConfig
 from huggingface_hub import snapshot_download
 import comfy.model_management
 import folder_paths
-from ..utils import tensor2pil, find_local_unet_models
+from ..utils import tensor2pil, find_local_unet_models, hash_seed
 import base64
 from io import BytesIO
 from keye_vl_utils import process_vision_info
@@ -167,6 +167,11 @@ class KeyeModelLoader:
             raise RuntimeError(
                 f"Failed to download model {model_name}. Error: {str(e)}") from e
 
+    def save_quantized_model(self, save_directory):
+        self.model.save_pretrained(save_directory)
+        self.processor.save_pretrained(save_directory)
+        print(f"Quantized model saved to {save_directory}")
+
     def load_model(self, model_name, quantization, precision, device, auto_download, min_pixels, max_pixels, **kwargs):
         use_flash_attention_2 = kwargs.get("use_flash_attention_2", "enable")
         current_params = {
@@ -318,6 +323,7 @@ class KeyeNode:
                 "keye_model": ("KEYE_MODEL",),
                 "image": ("IMAGE",),
                 "prompt": ("STRING", {"default": "Describe this image in detail.", "multiline": True}),
+                "special_captioning_token": ("STRING", {"default": "", "multiline": False}),
                 "thinking_mode": (["Auto", "Non-Thinking", "Thinking"], {"default": "Auto"}),
                 "resolution_control": (["Default", "Min/Max Pixels", "Exact Dimensions"], {"default": "Default"}),
                 "device": (["cuda", "cpu"], {"default": "cuda"}),
@@ -335,12 +341,14 @@ class KeyeNode:
             }
         }
 
-    RETURN_TYPES = ("STRING", "STRING")
-    RETURN_NAMES = ("description", "thinking_analysis")
+    RETURN_TYPES = ("STRING", "STRING", "STRING", "STRING")
+    RETURN_NAMES = ("text", "thinking",
+                    "text_list", "thinking_list")
+    OUTPUT_IS_LIST = (False, False, True, True)
     FUNCTION = "generate_text"
     CATEGORY = "VL-Nodes/Keye-VL"
 
-    def generate_text(self, keye_model, image, prompt, thinking_mode, resolution_control, device, max_new_tokens, temperature, top_p, do_sample, seed, **kwargs):
+    def generate_text(self, keye_model, image, prompt, special_captioning_token, thinking_mode, resolution_control, device, max_new_tokens, temperature, top_p, do_sample, seed, **kwargs):
         model_data = keye_model
         model = model_data["model"]
         processor = model_data["processor"]
@@ -400,142 +408,159 @@ class KeyeNode:
             inference_device = original_device
 
         current_inference_device = model.device
-        output_text = ""
-        thinking_analysis_text = ""
+        set_seed(hash_seed(seed))
+        output_texts = []
+        thinking_analysis_texts = []
 
         try:
-            pil_image = tensor2pil(image)
+            pil_images = tensor2pil(image)
+            batch_size = len(pil_images)
+            print(f"Keye-VL: Batch size: {batch_size}")
 
-            # Convert PIL image to base64
-            buffered = BytesIO()
-            pil_image.save(buffered, format="PNG")
-            img_str = base64.b64encode(buffered.getvalue()).decode("utf-8")
-            base64_image = f"data:image/png;base64,{img_str}"
+            for i in range(batch_size):
+                print(f"Keye-VL: Processing image {i+1}/{batch_size}")
+                pil_image = pil_images[i]
 
-            final_prompt = prompt
-            if thinking_mode == "Non-Thinking":
-                final_prompt += "/no_think"
-            elif thinking_mode == "Thinking":
-                final_prompt += "/think"
+                # Convert PIL image to base64
+                buffered = BytesIO()
+                pil_image.save(buffered, format="PNG")
+                img_str = base64.b64encode(buffered.getvalue()).decode("utf-8")
+                base64_image = f"data:image/png;base64,{img_str}"
 
-            image_content = {"type": "image", "image": base64_image}
+                final_prompt = prompt
+                if thinking_mode == "Non-Thinking":
+                    final_prompt += "/no_think"
+                elif thinking_mode == "Thinking":
+                    final_prompt += "/think"
 
-            if resolution_control == "Exact Dimensions":
-                resized_height = kwargs.get("resized_height", 0)
-                resized_width = kwargs.get("resized_width", 0)
-                if resized_height > 0 and resized_width > 0:
-                    image_content["resized_height"] = resized_height
-                    image_content["resized_width"] = resized_width
-            elif resolution_control == "Min/Max Pixels":
-                min_pixels = kwargs.get("min_pixels", 0)
-                max_pixels = kwargs.get("max_pixels", 0)
-                if min_pixels > 0 and max_pixels > 0:
-                    image_content["min_pixels"] = min_pixels
-                    image_content["max_pixels"] = max_pixels
+                image_content = {"type": "image", "image": base64_image}
 
-            messages = [{
-                "role": "user",
-                "content": [
-                    image_content,
-                    {"type": "text", "text": final_prompt},
-                ],
-            }]
+                if resolution_control == "Exact Dimensions":
+                    resized_height = kwargs.get("resized_height", 0)
+                    resized_width = kwargs.get("resized_width", 0)
+                    if resized_height > 0 and resized_width > 0:
+                        image_content["resized_height"] = resized_height
+                        image_content["resized_width"] = resized_width
+                elif resolution_control == "Min/Max Pixels":
+                    min_pixels = kwargs.get("min_pixels", 0)
+                    max_pixels = kwargs.get("max_pixels", 0)
+                    if min_pixels > 0 and max_pixels > 0:
+                        image_content["min_pixels"] = min_pixels
+                        image_content["max_pixels"] = max_pixels
 
-            text = processor.apply_chat_template(
-                messages, tokenize=False, add_generation_prompt=True
-            )
+                messages = [{
+                    "role": "user",
+                    "content": [
+                        image_content,
+                        {"type": "text", "text": final_prompt},
+                    ],
+                }]
 
-            result = process_vision_info(messages)
-            # Handle both 2-tuple and 3-tuple returns from process_vision_info
-            if isinstance(result, tuple) and len(result) >= 2:
-                image_inputs, video_inputs = result[0], result[1]
-            else:
-                raise ValueError(
-                    f"Unexpected return value from process_vision_info: {result}")
+                text = processor.apply_chat_template(
+                    messages, tokenize=False, add_generation_prompt=True
+                )
 
-            inputs = processor(
-                text=[text],
-                images=image_inputs,
-                videos=video_inputs,
-                padding=True,
-                return_tensors="pt",
-            ).to(current_inference_device, dtype=dtype)
-
-            do_sample_bool = do_sample.lower() == "true"
-            gen_kwargs = {
-                "max_new_tokens": max_new_tokens,
-                "do_sample": do_sample_bool,
-                "top_p": top_p if do_sample_bool else None,
-                "temperature": temperature if do_sample_bool else None,
-                "use_cache": True,
-            }
-
-            with torch.inference_mode():
-                generated_ids = model.generate(**inputs, **gen_kwargs)
-                generated_ids_trimmed = [
-                    out_ids[len(in_ids):] for in_ids, out_ids in zip(inputs.input_ids, generated_ids)
-                ]
-                output_text = processor.batch_decode(
-                    generated_ids_trimmed, skip_special_tokens=True, clean_up_tokenization_spaces=False
-                )[0]
-
-            # Process output based on thinking mode
-            import re
-
-            # Handle thinking mode output
-            if thinking_mode == "Thinking":
-                # Extract content from <think> and <answer> tags
-                think_match = re.search(
-                    r'<think>(.*?)</think>', output_text, re.DOTALL)
-                answer_match = re.search(
-                    r'<answer>(.*?)</answer>', output_text, re.DOTALL)
-
-                if think_match:
-                    thinking_analysis_text = think_match.group(1).strip()
-                if answer_match:
-                    output_text = answer_match.group(1).strip()
+                result = process_vision_info(messages)
+                # Handle both 2-tuple and 3-tuple returns from process_vision_info
+                if isinstance(result, tuple) and len(result) >= 2:
+                    image_inputs, video_inputs = result[0], result[1]
                 else:
-                    # If no <answer> tag, remove <think> tag content and use remaining text
-                    output_text = re.sub(
-                        r'<think>.*?</think>', '', output_text, flags=re.DOTALL).strip()
-            elif thinking_mode == "Auto":
-                # Handle auto mode - could have analysis text and/or thinking tags
-                analysis_match = re.search(
-                    r'<analysis>.*?</analysis>', output_text, re.DOTALL)
-                think_match = re.search(
-                    r'<think>(.*?)</think>', output_text, re.DOTALL)
-                answer_match = re.search(
-                    r'<answer>(.*?)</answer>', output_text, re.DOTALL)
+                    raise ValueError(
+                        f"Unexpected return value from process_vision_info: {result}")
 
-                # Extract analysis text if present
-                if analysis_match:
-                    thinking_analysis_text = analysis_match.group(0).strip()
+                inputs = processor(
+                    text=[text],
+                    images=image_inputs,
+                    videos=video_inputs,
+                    padding=True,
+                    return_tensors="pt",
+                ).to(current_inference_device, dtype=dtype)
 
-                # Handle thinking tags if present
-                if think_match:
-                    # Append thinking content to analysis text
-                    if thinking_analysis_text:
-                        thinking_analysis_text += "\n\n" + \
-                            think_match.group(1).strip()
-                    else:
+                do_sample_bool = do_sample.lower() == "true"
+                gen_kwargs = {
+                    "max_new_tokens": max_new_tokens,
+                    "do_sample": do_sample_bool,
+                    "top_p": top_p if do_sample_bool else None,
+                    "temperature": temperature if do_sample_bool else None,
+                    "use_cache": True,
+                }
+
+                with torch.inference_mode():
+                    generated_ids = model.generate(**inputs, **gen_kwargs)
+                    generated_ids_trimmed = [
+                        out_ids[len(in_ids):] for in_ids, out_ids in zip(inputs.input_ids, generated_ids)
+                    ]
+                    output_text = processor.batch_decode(
+                        generated_ids_trimmed, skip_special_tokens=True, clean_up_tokenization_spaces=False
+                    )[0]
+
+                # Process output based on thinking mode
+                import re
+                thinking_analysis_text = ""
+
+                # Handle thinking mode output
+                if thinking_mode == "Thinking":
+                    # Extract content from <think> and <answer> tags
+                    think_match = re.search(
+                        r'<think>(.*?)</think>', output_text, re.DOTALL)
+                    answer_match = re.search(
+                        r'<answer>(.*?)</answer>', output_text, re.DOTALL)
+
+                    if think_match:
                         thinking_analysis_text = think_match.group(1).strip()
+                    if answer_match:
+                        output_text = answer_match.group(1).strip()
+                    else:
+                        # If no <answer> tag, remove <think> tag content and use remaining text
+                        output_text = re.sub(
+                            r'<think>.*?</think>', '', output_text, flags=re.DOTALL).strip()
+                elif thinking_mode == "Auto":
+                    # Handle auto mode - could have analysis text and/or thinking tags
+                    analysis_match = re.search(
+                        r'<analysis>.*?</analysis>', output_text, re.DOTALL)
+                    think_match = re.search(
+                        r'<think>(.*?)</think>', output_text, re.DOTALL)
+                    answer_match = re.search(
+                        r'<answer>(.*?)</answer>', output_text, re.DOTALL)
 
-                # Extract answer content if present, otherwise clean up the text
-                if answer_match:
-                    output_text = answer_match.group(1).strip()
-                else:
-                    # Remove analysis and thinking tags from output_text
-                    output_text = re.sub(
-                        r'<analysis>.*?</analysis>', '', output_text, flags=re.DOTALL).strip()
-                    output_text = re.sub(
-                        r'<think>.*?</think>', '', output_text, flags=re.DOTALL).strip()
+                    # Extract analysis text if present
+                    if analysis_match:
+                        thinking_analysis_text = analysis_match.group(
+                            0).strip()
+
+                    # Handle thinking tags if present
+                    if think_match:
+                        # Append thinking content to analysis text
+                        if thinking_analysis_text:
+                            thinking_analysis_text += "\n\n" + \
+                                think_match.group(1).strip()
+                        else:
+                            thinking_analysis_text = think_match.group(
+                                1).strip()
+
+                    # Extract answer content if present, otherwise clean up the text
+                    if answer_match:
+                        output_text = answer_match.group(1).strip()
+                    else:
+                        # Remove analysis and thinking tags from output_text
+                        output_text = re.sub(
+                            r'<analysis>.*?</analysis>', '', output_text, flags=re.DOTALL).strip()
+                        output_text = re.sub(
+                            r'<think>.*?</think>', '', output_text, flags=re.DOTALL).strip()
+
+                if special_captioning_token and special_captioning_token.strip():
+                    output_text = f"{special_captioning_token.strip()}, {output_text}"
+
+                output_text = ' '.join(output_text.split())
+                output_texts.append(output_text.strip())
+                thinking_analysis_texts.append(thinking_analysis_text.strip())
 
         except Exception as e:
             print(f"Error generating text with Keye-VL: {str(e)}")
             import traceback
             traceback.print_exc()
-            output_text = f"Error: {str(e)}"
-            thinking_analysis_text = ""
+            output_texts.append(f"Error: {str(e)}")
+            thinking_analysis_texts.append("")
         finally:
             if moved_to_target and not is_quantized:
                 print(f"Keye-VL: Moving model back to {original_device}.")
@@ -544,7 +569,7 @@ class KeyeNode:
                 if torch.cuda.is_available():
                     torch.cuda.empty_cache()
 
-        return (output_text.strip(), thinking_analysis_text.strip(),)
+        return ("\n\n=============================\n\n".join(output_texts), "\n\n=============================\n\n".join(thinking_analysis_texts), tuple(output_texts), tuple(thinking_analysis_texts))
 
 
 NODE_CLASS_MAPPINGS = {

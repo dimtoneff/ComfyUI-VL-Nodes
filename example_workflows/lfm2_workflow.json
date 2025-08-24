@@ -1,8 +1,8 @@
 {
   "id": "9e07843c-8f59-4563-8826-12739285ffca",
   "revision": 0,
-  "last_node_id": 60,
-  "last_link_id": 102,
+  "last_node_id": 61,
+  "last_link_id": 105,
   "nodes": [
     {
       "id": 12,
@@ -26,7 +26,7 @@
           "name": "IMAGE",
           "type": "IMAGE",
           "links": [
-            96
+            103
           ]
         },
         {
@@ -46,15 +46,92 @@
       ]
     },
     {
-      "id": 58,
-      "type": "LFM2TransformerImageToText",
+      "id": 57,
+      "type": "LFM2TransformerModelLoader",
       "pos": [
-        -183.58644104003906,
-        -82.93196105957031
+        -470.8592529296875,
+        -74.93205261230469
       ],
       "size": [
-        391.2727355957031,
-        204
+        270,
+        154
+      ],
+      "flags": {},
+      "order": 1,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "lfm2_hf_model",
+          "type": "LFM2_HF_MODEL",
+          "links": [
+            104
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfyui-vl-nodes",
+        "ver": "8e0e876a96488dabe86f09d3696364ef74d1b52e",
+        "Node name for S&R": "LFM2TransformerModelLoader",
+        "aux_id": "dimtoneff/ComfyUI-VL-Nodes"
+      },
+      "widgets_values": [
+        "LiquidAI/LFM2-VL-450M",
+        "none",
+        "bfloat16",
+        "cuda",
+        "enable"
+      ]
+    },
+    {
+      "id": 60,
+      "type": "MiMoFreeMemoryAPI",
+      "pos": [
+        -131.95010375976562,
+        -172.38650512695312
+      ],
+      "size": [
+        270,
+        58
+      ],
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "anything",
+          "type": "*",
+          "link": 105
+        }
+      ],
+      "outputs": [
+        {
+          "name": "output",
+          "type": "*",
+          "links": [
+            102
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfyui-vl-nodes",
+        "ver": "6ab7af32e11476b93ee4c8f99488c3f648c838b0",
+        "Node name for S&R": "MiMoFreeMemoryAPI"
+      },
+      "widgets_values": [
+        false
+      ]
+    },
+    {
+      "id": 61,
+      "type": "LFM2TransformerImageToText",
+      "pos": [
+        -183.5865020751953,
+        -73.47737121582031
+      ],
+      "size": [
+        385.4545593261719,
+        276
       ],
       "flags": {},
       "order": 2,
@@ -63,12 +140,12 @@
         {
           "name": "lfm2_hf_model",
           "type": "LFM2_HF_MODEL",
-          "link": 95
+          "link": 104
         },
         {
           "name": "image",
           "type": "IMAGE",
-          "link": 96
+          "link": 103
         }
       ],
       "outputs": [
@@ -76,34 +153,42 @@
           "name": "text",
           "type": "STRING",
           "links": [
-            101
+            105
           ]
+        },
+        {
+          "name": "text_list",
+          "shape": 6,
+          "type": "STRING",
+          "links": null
         }
       ],
       "properties": {
         "cnr_id": "comfyui-vl-nodes",
-        "ver": "8e0e876a96488dabe86f09d3696364ef74d1b52e",
-        "Node name for S&R": "LFM2TransformerImageToText",
-        "aux_id": "dimtoneff/ComfyUI-VL-Nodes"
+        "ver": "1744cefa4de7463aa23edb0b2b94889498b1ef85",
+        "Node name for S&R": "LFM2TransformerImageToText"
       },
       "widgets_values": [
         "You are an assistant who perfectly describes images. Fully describe the image as a prompt for Stable Diffusion text2image SDXL model. If you see nsfw stuff describe it too. Do not omit anything! Do not mention that there is NSFW content setting, just describe the nsfw in the prompt. !Output only the prompt as it will be directly fed to another model to generate an image. Be clear and use short sentences to describe the image!",
+        "",
+        653275301401081,
+        "randomize",
         75,
-        0.3,
-        0.15,
-        1.05
+        0.1,
+        0.16,
+        1.1
       ]
     },
     {
       "id": 41,
       "type": "ShowText|pysssss",
       "pos": [
-        -185.53274536132812,
-        161.2406005859375
+        -184.80543518066406,
+        255.78598022460938
       ],
       "size": [
-        396,
-        278.79998779296875
+        382.9089660644531,
+        177.70907592773438
       ],
       "flags": {},
       "order": 4,
@@ -129,112 +214,11 @@
         "Node name for S&R": "ShowText|pysssss"
       },
       "widgets_values": [
-        "A serene sunset scene unfolds before us, with a warm orange glow painting the sky and reflecting off the calm water. In the foreground, two silhouetted figures stand on rocky terrain, gazing out at the tranquil waters. In the distance, two small boats drift peacefully, their occupants enjoying the beautiful evening. The overall atmosphere is one of peaceful contempl"
-      ]
-    },
-    {
-      "id": 60,
-      "type": "MiMoFreeMemoryAPI",
-      "pos": [
-        -160.31373596191406,
-        -184.0229034423828
-      ],
-      "size": [
-        270,
-        58
-      ],
-      "flags": {},
-      "order": 3,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "anything",
-          "type": "*",
-          "link": 101
-        }
-      ],
-      "outputs": [
-        {
-          "name": "output",
-          "type": "*",
-          "links": [
-            102
-          ]
-        }
-      ],
-      "properties": {
-        "cnr_id": "comfyui-vl-nodes",
-        "ver": "6ab7af32e11476b93ee4c8f99488c3f648c838b0",
-        "Node name for S&R": "MiMoFreeMemoryAPI"
-      },
-      "widgets_values": [
-        false
-      ]
-    },
-    {
-      "id": 57,
-      "type": "LFM2TransformerModelLoader",
-      "pos": [
-        -470.8592529296875,
-        -74.93205261230469
-      ],
-      "size": [
-        270,
-        154
-      ],
-      "flags": {},
-      "order": 1,
-      "mode": 0,
-      "inputs": [],
-      "outputs": [
-        {
-          "name": "lfm2_hf_model",
-          "type": "LFM2_HF_MODEL",
-          "links": [
-            95
-          ]
-        }
-      ],
-      "properties": {
-        "cnr_id": "comfyui-vl-nodes",
-        "ver": "8e0e876a96488dabe86f09d3696364ef74d1b52e",
-        "Node name for S&R": "LFM2TransformerModelLoader",
-        "aux_id": "dimtoneff/ComfyUI-VL-Nodes"
-      },
-      "widgets_values": [
-        "LiquidAI/LFM2-VL-450M",
-        "none",
-        "bfloat16",
-        "cuda",
-        "enable"
+        "A serene sunset scene unfolds before us, with warm golden light painting the sky and reflecting off the calm waters below. In the foreground, two silhouetted figures stand on rocky terrain, gazing out at the tranquil water. A small boat carrying two people floats nearby, adding a sense of scale and human presence to the vast landscape. The overall atmosphere"
       ]
     }
   ],
   "links": [
-    [
-      95,
-      57,
-      0,
-      58,
-      0,
-      "LFM2_HF_MODEL"
-    ],
-    [
-      96,
-      12,
-      0,
-      58,
-      1,
-      "IMAGE"
-    ],
-    [
-      101,
-      58,
-      0,
-      60,
-      0,
-      "*"
-    ],
     [
       102,
       60,
@@ -242,6 +226,30 @@
       41,
       0,
       "STRING"
+    ],
+    [
+      103,
+      12,
+      0,
+      61,
+      1,
+      "IMAGE"
+    ],
+    [
+      104,
+      57,
+      0,
+      61,
+      0,
+      "LFM2_HF_MODEL"
+    ],
+    [
+      105,
+      61,
+      0,
+      60,
+      0,
+      "*"
     ]
   ],
   "groups": [],
@@ -254,7 +262,7 @@
         424.9319852364704
       ]
     },
-    "frontendVersion": "1.25.9",
+    "frontendVersion": "1.25.10",
     "VHS_latentpreview": false,
     "VHS_latentpreviewrate": 0,
     "VHS_MetadataImage": true,

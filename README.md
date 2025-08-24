@@ -4,6 +4,26 @@ This repository provides a collection of custom nodes for ComfyUI that integrate
 
 ![](./example_workflows/ovis2.5_workflow.JPG)
 
+## Batch Image Captioning (version>=0.6)
+
+A key feature of this custom node set is the ability to caption a whole directory of images in one go. By using the `Load Images/FileNames from Dir (Batch)(VL)` or `Load Images/FileNames from Dir (List)(VL)` nodes, you can feed a series of images into any of the supported VL models and generate captions for each one. The workflow is designed to save the generated text files next to the original images, making it easy to manage large datasets for training or analysis.
+
+* Input is a directory with a batch of images
+* The output is a batch of single .txt files with the same name as the image with the description in it, saved in the same directory as the images
+* You can add a special token as a prefix
+* You are going to need to install the `Save Text File` node from [was-node-suite-comfyu](https://github.com/WASasquatch/was-node-suite-comfyuil)
+* **All the model nodes were updated to support batch image captioning**
+
+### Nodes
+![](batch_loaders.png)
+
+### Example Workflow
+![](./example_workflows/Batch_images_caption_workflow.jpg)
+
+### Resulting files
+
+![](files.png)
+
 ## Features
 
 This project includes nodes for the following models:
@@ -136,9 +156,10 @@ Once installed, you will find the nodes under the `MiMo`, `LFM2-VL`, `Ovis2.5`, 
     *   **Thinking Mode**: Appends `/think` to the prompt to encourage a more detailed, reasoned response.
 *   **Image Resolution**: You can control the image resolution for a potential performance boost by setting `min_pixels` and `max_pixels`, or `resized_height` and `resized_width`.
 
+### General Nodes
 
-### Memory Node
-
+*   **`Load Images/FileNames from Dir (Batch)(VL)`**: Loads a batch of images from a specified directory and outputs them as a single batch tensor. It also provides the file names for each image, allowing for automated saving of generated captions.
+*   **`Load Images/FileNames from Dir (List)(VL)`**: Similar to the batch version, but outputs images and file names as lists. This is useful for workflows that require iterating through images individually.
 *   **`Free Memory (VL Nodes)`** (Category: `VL-Nodes/Memory`): Unloads all loaded VL models to free up VRAM.
 
 ## Example Workflow
@@ -150,7 +171,7 @@ Once installed, you will find the nodes under the `MiMo`, `LFM2-VL`, `Ovis2.5`, 
 
 ## Special Thanks and Links
 
-<a href="https://www.flaticon.com/free-icons/visual" title="visual icons">Visual icons created by Freepik - Flaticon</a>
+[Visual icons created by Freepik - Flaticon](https://www.flaticon.com/free-icons/visual)
 
 ## Other examples
 
