@@ -1,12 +1,15 @@
-import os
 import gc
+import os
+
 import torch
 from huggingface_hub import snapshot_download
+from torch.amp.autocast_mode import autocast
 from transformers import AutoModelForImageTextToText, AutoProcessor, set_seed
 from transformers.utils.quantization_config import BitsAndBytesConfig
+
 import folder_paths
-from torch.amp.autocast_mode import autocast
-from ..utils import tensor2pil, find_local_unet_models, hash_seed
+
+from ..utils import find_local_unet_models, hash_seed, tensor2pil
 
 # Global registry for LFM2 loaders
 # _lfm2_gguf_loader_instances = []
@@ -35,8 +38,7 @@ def unload_all_lfm2_hf_models():
 
 # --- Transformers Nodes ---
 
-lfm2_hf_models_dir = os.path.join(
-    folder_paths.get_folder_paths("unet")[0], "LFM2-VL-HF")
+lfm2_hf_models_dir = os.path.join(folder_paths.get_folder_paths("unet")[0], "LFM2-VL-HF")
 os.makedirs(lfm2_hf_models_dir, exist_ok=True)
 
 
@@ -87,21 +89,15 @@ class LFM2TransformerModelLoader:
     def download_model(self, model_id):
         """Download the model from Hugging Face."""
         # The download directory is defined at the module level
-        local_dir = os.path.join(lfm2_hf_models_dir, model_id.split('/')[-1])
+        local_dir = os.path.join(lfm2_hf_models_dir, model_id.split("/")[-1])
         print(f"LFM2 HF: Downloading model: {model_id} to {local_dir}")
         try:
-            snapshot_download(
-                repo_id=model_id,
-                local_dir=local_dir,
-                local_dir_use_symlinks=False
-            )
-            print(
-                f"LFM2 HF: Successfully downloaded {model_id} to {local_dir}")
+            snapshot_download(repo_id=model_id, local_dir=local_dir, local_dir_use_symlinks=False)
+            print(f"LFM2 HF: Successfully downloaded {model_id} to {local_dir}")
             return local_dir
         except Exception as e:
             print(f"LFM2 HF: Error downloading model: {str(e)}")
-            raise RuntimeError(
-                f"Failed to download model {model_id}. Error: {str(e)}")
+            raise RuntimeError(f"Failed to download model {model_id}. Error: {str(e)}")
 
     def load_model(self, model_id, quantization, precision, device, auto_download):
         current_params = {
@@ -128,17 +124,15 @@ class LFM2TransformerModelLoader:
             dtype = torch.float32
 
         model_path_to_load = None
-        is_repo_id = '/' in model_id
+        is_repo_id = "/" in model_id
 
         # Determine the name to search for locally.
-        search_name = model_id.split('/')[-1]
+        search_name = model_id.split("/")[-1]
 
         # Use the utility to find all local models and their paths.
         local_models, local_model_paths = find_local_unet_models("lfm2")
-        print(
-            f"LFM2 HF: Found local models: {local_models}, {local_model_paths}")
-        path_map = {name: path for name, path in zip(
-            local_models, local_model_paths)}
+        print(f"LFM2 HF: Found local models: {local_models}, {local_model_paths}")
+        path_map = {name: path for name, path in zip(local_models, local_model_paths)}
 
         if search_name in path_map:
             model_path_to_load = path_map[search_name]
@@ -147,16 +141,13 @@ class LFM2TransformerModelLoader:
         # If not found locally and it's a repo_id, handle download or direct HF loading.
         if model_path_to_load is None and is_repo_id:
             if auto_download == "enable":
-                print(
-                    f"LFM2 HF: Local model not found. Downloading from Hugging Face repo: {model_id}")
+                print(f"LFM2 HF: Local model not found. Downloading from Hugging Face repo: {model_id}")
                 model_path_to_load = self.download_model(model_id)
             else:
                 model_path_to_load = model_id
-                print(
-                    f"LFM2 HF: Will attempt to load from Hugging Face repo: {model_path_to_load}")
+                print(f"LFM2 HF: Will attempt to load from Hugging Face repo: {model_path_to_load}")
         if model_path_to_load is None:
-            raise FileNotFoundError(
-                f"LFM2-VL model '{model_id}' not found in any of the 'unet' directories: {folder_paths.get_folder_paths('unet')}")
+            raise FileNotFoundError(f"LFM2-VL model '{model_id}' not found in any of the 'unet' directories: {folder_paths.get_folder_paths('unet')}")
         try:
             load_kwargs = {
                 "torch_dtype": dtype,
@@ -165,12 +156,7 @@ class LFM2TransformerModelLoader:
 
             if quantization != "none":
                 if quantization == "4bit":
-                    quant_config = BitsAndBytesConfig(
-                        load_in_4bit=True,
-                        bnb_4bit_quant_type="nf4",
-                        bnb_4bit_use_double_quant=True,
-                        bnb_4bit_compute_dtype=dtype
-                    )
+                    quant_config = BitsAndBytesConfig(load_in_4bit=True, bnb_4bit_quant_type="nf4", bnb_4bit_use_double_quant=True, bnb_4bit_compute_dtype=dtype)
                 else:  # 8bit
                     quant_config = BitsAndBytesConfig(load_in_8bit=True)
                 load_kwargs["quantization_config"] = quant_config
@@ -178,10 +164,8 @@ class LFM2TransformerModelLoader:
             device_mapping = "cpu" if device == "cpu" else "auto"
             load_kwargs["device_map"] = device_mapping
 
-            self.model = AutoModelForImageTextToText.from_pretrained(
-                model_path_to_load, **load_kwargs)
-            self.processor = AutoProcessor.from_pretrained(
-                model_path_to_load, trust_remote_code=True)
+            self.model = AutoModelForImageTextToText.from_pretrained(model_path_to_load, **load_kwargs)
+            self.processor = AutoProcessor.from_pretrained(model_path_to_load, trust_remote_code=True)
             self.cached_params = current_params
 
             return ({"model": self.model, "processor": self.processor, "device": device, "dtype": dtype},)
@@ -199,7 +183,7 @@ class LFM2TransformerImageToText:
                 "image": ("IMAGE",),
                 "prompt": ("STRING", {"default": "Describe this image.", "multiline": True}),
                 "special_captioning_token": ("STRING", {"default": "", "multiline": False}),
-                "seed": ("INT", {"default": 69, "min": 1, "max": 0xffffffffffffffff}),
+                "seed": ("INT", {"default": 69, "min": 1, "max": 0xFFFFFFFFFFFFFFFF}),
                 "max_new_tokens": ("INT", {"default": 75, "min": 64, "max": 4096}),
                 "temperature": ("FLOAT", {"default": 0.1, "min": 0.0, "max": 1.0, "step": 0.1}),
                 "min_p": ("FLOAT", {"default": 0.15, "min": 0.0, "max": 1.0, "step": 0.01}),
@@ -216,17 +200,16 @@ class LFM2TransformerImageToText:
     def generate_text(self, lfm2_hf_model, image, prompt, special_captioning_token, seed, max_new_tokens, temperature, min_p, repetition_penalty):
         model = lfm2_hf_model["model"]
         processor = lfm2_hf_model["processor"]
-        target_device_str = 'cuda' if torch.cuda.is_available() else 'cpu'
+        target_device_str = "cuda" if torch.cuda.is_available() else "cpu"
         dtype = lfm2_hf_model["dtype"]
 
         original_device = model.device
         target_device = torch.device(target_device_str)
 
-        move_model = target_device.type == 'cuda' and original_device.type == 'cpu'
+        move_model = target_device.type == "cuda" and original_device.type == "cpu"
 
         if move_model:
-            print(
-                f"LFM2 HF: Moving model from {original_device} to {target_device} for inference.")
+            print(f"LFM2 HF: Moving model from {original_device} to {target_device} for inference.")
             model.to(target_device)
 
         set_seed(hash_seed(seed))
@@ -239,7 +222,7 @@ class LFM2TransformerImageToText:
 
             for i in range(batch_size):
                 pil_image = pil_images[i]
-                print(f"LFM2 HF: Processing image {i+1}/{batch_size}")
+                print(f"LFM2 HF: Processing image {i + 1}/{batch_size}")
                 conversation = [
                     {
                         "role": "user",
@@ -259,16 +242,8 @@ class LFM2TransformerImageToText:
                         tokenize=True,
                     ).to(target_device)
 
-                    outputs = model.generate(
-                        **inputs,
-                        max_new_tokens=max_new_tokens,
-                        temperature=temperature,
-                        min_p=min_p,
-                        repetition_penalty=repetition_penalty,
-                        do_sample=True if temperature > 0 else False
-                    )
-                    result = processor.batch_decode(
-                        outputs, skip_special_tokens=True)[0]
+                    outputs = model.generate(**inputs, max_new_tokens=max_new_tokens, temperature=temperature, min_p=min_p, repetition_penalty=repetition_penalty, do_sample=True if temperature > 0 else False)
+                    result = processor.batch_decode(outputs, skip_special_tokens=True)[0]
 
                 # Handle different assistant markers
                 possible_markers = ["<|im_start|>assistant\n", "assistant\n"]
@@ -277,12 +252,10 @@ class LFM2TransformerImageToText:
                 for marker in possible_markers:
                     last_occurrence = result.rfind(marker)
                     if last_occurrence != -1:
-                        final_text = result[last_occurrence +
-                                            len(marker):].strip()
+                        final_text = result[last_occurrence + len(marker) :].strip()
                         # Remove <|im_end|> if it exists
                         if final_text.endswith("<|im_end|>"):
-                            final_text = final_text[:-
-                                                    len("<|im_end|>")].strip()
+                            final_text = final_text[: -len("<|im_end|>")].strip()
                         break
 
                 if "assistant" in final_text:
@@ -291,7 +264,7 @@ class LFM2TransformerImageToText:
                 if special_captioning_token and special_captioning_token.strip():
                     final_text = f"{special_captioning_token.strip()}, {final_text}"
 
-                final_text = ' '.join(final_text.split())
+                final_text = " ".join(final_text.split())
                 results.append(final_text.strip('"'))
         finally:
             if move_model:
@@ -302,6 +275,7 @@ class LFM2TransformerImageToText:
                     torch.cuda.empty_cache()
 
         return ("\n\n=============================\n\n".join(results), tuple(results))
+
 
 # --- GGUF Nodes ---
 # Loader works with latest llama.cpp but the inference did not work properly.

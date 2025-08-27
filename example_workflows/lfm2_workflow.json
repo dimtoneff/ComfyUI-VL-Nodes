@@ -1,8 +1,8 @@
 {
   "id": "9e07843c-8f59-4563-8826-12739285ffca",
   "revision": 0,
-  "last_node_id": 61,
-  "last_link_id": 105,
+  "last_node_id": 62,
+  "last_link_id": 107,
   "nodes": [
     {
       "id": 12,
@@ -84,45 +84,6 @@
       ]
     },
     {
-      "id": 60,
-      "type": "MiMoFreeMemoryAPI",
-      "pos": [
-        -131.95010375976562,
-        -172.38650512695312
-      ],
-      "size": [
-        270,
-        58
-      ],
-      "flags": {},
-      "order": 3,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "anything",
-          "type": "*",
-          "link": 105
-        }
-      ],
-      "outputs": [
-        {
-          "name": "output",
-          "type": "*",
-          "links": [
-            102
-          ]
-        }
-      ],
-      "properties": {
-        "cnr_id": "comfyui-vl-nodes",
-        "ver": "6ab7af32e11476b93ee4c8f99488c3f648c838b0",
-        "Node name for S&R": "MiMoFreeMemoryAPI"
-      },
-      "widgets_values": [
-        false
-      ]
-    },
-    {
       "id": 61,
       "type": "LFM2TransformerImageToText",
       "pos": [
@@ -153,7 +114,7 @@
           "name": "text",
           "type": "STRING",
           "links": [
-            105
+            106
           ]
         },
         {
@@ -171,7 +132,7 @@
       "widgets_values": [
         "You are an assistant who perfectly describes images. Fully describe the image as a prompt for Stable Diffusion text2image SDXL model. If you see nsfw stuff describe it too. Do not omit anything! Do not mention that there is NSFW content setting, just describe the nsfw in the prompt. !Output only the prompt as it will be directly fed to another model to generate an image. Be clear and use short sentences to describe the image!",
         "",
-        653275301401081,
+        380045757937383,
         "randomize",
         75,
         0.1,
@@ -197,7 +158,7 @@
         {
           "name": "text",
           "type": "STRING",
-          "link": 102
+          "link": 107
         }
       ],
       "outputs": [
@@ -214,19 +175,50 @@
         "Node name for S&R": "ShowText|pysssss"
       },
       "widgets_values": [
-        "A serene sunset scene unfolds before us, with warm golden light painting the sky and reflecting off the calm waters below. In the foreground, two silhouetted figures stand on rocky terrain, gazing out at the tranquil water. A small boat carrying two people floats nearby, adding a sense of scale and human presence to the vast landscape. The overall atmosphere"
+        "A serene sunset scene unfolds before us, with two silhouetted figures standing on rocky terrain overlooking a tranquil body of water. The sky is ablaze with warm hues of orange and yellow, casting long shadows across the landscape. In the distance, majestic mountains rise against the horizon, their peaks partially obscured by the golden light. A small"
+      ]
+    },
+    {
+      "id": 62,
+      "type": "VLNodesFreeMemoryAPI",
+      "pos": [
+        -137.04110717773438,
+        -177.47744750976562
+      ],
+      "size": [
+        270,
+        58
+      ],
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "anything",
+          "type": "*",
+          "link": 106
+        }
+      ],
+      "outputs": [
+        {
+          "name": "output",
+          "type": "*",
+          "links": [
+            107
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfyui-vl-nodes",
+        "ver": "389fe97681de4045378f5acbe6ec52a2f58390eb",
+        "Node name for S&R": "VLNodesFreeMemoryAPI"
+      },
+      "widgets_values": [
+        false
       ]
     }
   ],
   "links": [
-    [
-      102,
-      60,
-      0,
-      41,
-      0,
-      "STRING"
-    ],
     [
       103,
       12,
@@ -244,12 +236,20 @@
       "LFM2_HF_MODEL"
     ],
     [
-      105,
+      106,
       61,
       0,
-      60,
+      62,
       0,
       "*"
+    ],
+    [
+      107,
+      62,
+      0,
+      41,
+      0,
+      "STRING"
     ]
   ],
   "groups": [],

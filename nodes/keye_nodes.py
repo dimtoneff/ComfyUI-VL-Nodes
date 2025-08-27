@@ -1,25 +1,28 @@
-import os
+import base64
 import gc
+import os
+from io import BytesIO
+
 import torch
+from huggingface_hub import snapshot_download
+from keye_vl_utils import process_vision_info
 from transformers import AutoModel, AutoProcessor, set_seed
 from transformers.utils.quantization_config import BitsAndBytesConfig
-from huggingface_hub import snapshot_download
+
 import comfy.model_management
 import folder_paths
-from ..utils import tensor2pil, find_local_unet_models, hash_seed
-import base64
-from io import BytesIO
-from keye_vl_utils import process_vision_info
+
+from ..utils import find_local_unet_models, hash_seed, tensor2pil
 
 try:
     import flash_attn
+
     flash_attn_available = True
 except ImportError:
     flash_attn_available = False
 
 # Create a directory for Keye models
-keye_dir = os.path.join(
-    folder_paths.get_folder_paths("unet")[0], "Keye-VL-HF")
+keye_dir = os.path.join(folder_paths.get_folder_paths("unet")[0], "Keye-VL-HF")
 os.makedirs(keye_dir, exist_ok=True)
 
 _keye_loader_instances = []
@@ -68,14 +71,13 @@ class KeyeModelLoader:
                 "precision": (["auto", "bfloat16", "float16", "float32"], {"default": "auto"}),
                 "device": (["cuda", "cpu"], {"default": "cuda"}),
                 "auto_download": (["enable", "disable"], {"default": "enable"}),
-                "min_pixels": ("INT", {"default": 256*28*28, "min": 0, "tooltip": "Min pixels for processor"}),
-                "max_pixels": ("INT", {"default": 1280*28*28, "min": 0, "tooltip": "Max pixels for processor"}),
+                "min_pixels": ("INT", {"default": 256 * 28 * 28, "min": 0, "tooltip": "Min pixels for processor"}),
+                "max_pixels": ("INT", {"default": 1280 * 28 * 28, "min": 0, "tooltip": "Max pixels for processor"}),
             }
         }
 
         if flash_attn_available:
-            inputs["required"]["use_flash_attention_2"] = (
-                ["enable", "disable"], {"default": "enable"})
+            inputs["required"]["use_flash_attention_2"] = (["enable", "disable"], {"default": "enable"})
 
         return inputs
 
@@ -91,8 +93,7 @@ class KeyeModelLoader:
 
         print("Keye-VL: Unloading model.")
 
-        is_quantized = getattr(self.model, 'is_loaded_in_8bit', False) or getattr(
-            self.model, 'is_loaded_in_4bit', False)
+        is_quantized = getattr(self.model, "is_loaded_in_8bit", False) or getattr(self.model, "is_loaded_in_4bit", False)
 
         if is_quantized:
             print("Keye-VL: De-initializing quantized model to free VRAM...")
@@ -104,9 +105,9 @@ class KeyeModelLoader:
                         if isinstance(child, (bnb.nn.Linear4bit, bnb.nn.Linear8bitLt)):
                             # Deleting the weight and bias from the child module
                             # can help trigger deallocation.
-                            if hasattr(child, 'weight'):
+                            if hasattr(child, "weight"):
                                 del child.weight
-                            if hasattr(child, 'bias') and child.bias is not None:
+                            if hasattr(child, "bias") and child.bias is not None:
                                 del child.bias
 
                             # Replacing with an empty module to break references
@@ -115,11 +116,9 @@ class KeyeModelLoader:
                             _replace_with_empty(child)
 
                 _replace_with_empty(self.model)
-                print(
-                    "Keye-VL: Replaced quantized layers with empty modules to aid memory release.")
+                print("Keye-VL: Replaced quantized layers with empty modules to aid memory release.")
             except Exception as e:
-                print(
-                    f"Keye-VL: Could not perform deep clean of quantized model, proceeding with standard unload. Error: {e}")
+                print(f"Keye-VL: Could not perform deep clean of quantized model, proceeding with standard unload. Error: {e}")
         else:
             try:
                 # For regular models, move to CPU to ensure VRAM is released before deleting
@@ -127,9 +126,9 @@ class KeyeModelLoader:
                 can_move_model = True
                 try:
                     # Check if model has any modules offloaded to cpu or disk
-                    if hasattr(self.model, 'hf_device_map'):
+                    if hasattr(self.model, "hf_device_map"):
                         for module_name, module_device in self.model.hf_device_map.items():
-                            if module_device in ['cpu', 'disk']:
+                            if module_device in ["cpu", "disk"]:
                                 can_move_model = False
                                 break
                 except Exception:
@@ -137,10 +136,9 @@ class KeyeModelLoader:
                     pass
 
                 if can_move_model:
-                    self.model.to(device='cpu')
+                    self.model.to(device="cpu")
                 else:
-                    print(
-                        "Keye-VL: Model has modules offloaded by accelerate, skipping move to CPU")
+                    print("Keye-VL: Model has modules offloaded by accelerate, skipping move to CPU")
             except Exception as e:
                 print(f"Keye-VL: Warning - could not move model to CPU: {e}")
 
@@ -155,17 +153,15 @@ class KeyeModelLoader:
             torch.cuda.empty_cache()
 
     def download_model(self, model_name):
-        local_dir = os.path.join(keye_dir, model_name.split('/')[-1])
+        local_dir = os.path.join(keye_dir, model_name.split("/")[-1])
         print(f"Downloading Keye-VL model: {model_name} to {local_dir}")
         try:
-            snapshot_download(repo_id=model_name,
-                              local_dir=local_dir)
+            snapshot_download(repo_id=model_name, local_dir=local_dir)
             print(f"Successfully downloaded {model_name} to {local_dir}")
             return local_dir
         except Exception as e:
             print(f"Error downloading model: {str(e)}")
-            raise RuntimeError(
-                f"Failed to download model {model_name}. Error: {str(e)}") from e
+            raise RuntimeError(f"Failed to download model {model_name}. Error: {str(e)}") from e
 
     def save_quantized_model(self, save_directory):
         self.model.save_pretrained(save_directory)
@@ -205,16 +201,15 @@ class KeyeModelLoader:
         else:  # auto
             dtype = "auto"
 
-        is_repo_id = '/' in model_name
+        is_repo_id = "/" in model_name
 
         # Handle quantization
         has_quant_config = False
         # Check for pre-quantization only if it's a local directory
         if not is_repo_id:
-            search_name = model_name.split('/')[-1]
+            search_name = model_name.split("/")[-1]
             local_models, local_model_paths = find_local_unet_models("Keye-VL")
-            path_map = {name: path for name, path in zip(
-                local_models, local_model_paths)}
+            path_map = {name: path for name, path in zip(local_models, local_model_paths)}
 
             model_path_to_check = None
             if search_name in path_map:
@@ -226,41 +221,36 @@ class KeyeModelLoader:
                 config_path = os.path.join(model_path_to_check, "config.json")
                 if os.path.exists(config_path):
                     import json
-                    with open(config_path, 'r', encoding='utf-8') as f:
+
+                    with open(config_path, "r", encoding="utf-8") as f:
                         config_data = json.load(f)
-                    if 'quantization_config' in config_data:
+                    if "quantization_config" in config_data:
                         has_quant_config = True
-                        print(
-                            "Keye-VL: Detected pre-quantized model. Ignoring UI quantization setting.")
+                        print("Keye-VL: Detected pre-quantized model. Ignoring UI quantization setting.")
 
         model_path_to_load = None
 
-        search_name = model_name.split('/')[-1]
+        search_name = model_name.split("/")[-1]
         local_models, local_model_paths = find_local_unet_models("Keye-VL")
-        path_map = {name: path for name, path in zip(
-            local_models, local_model_paths)}
+        path_map = {name: path for name, path in zip(local_models, local_model_paths)}
 
         if search_name in path_map:
             model_path_to_load = path_map[search_name]
             print(f"Keye-VL: Found local model at: {model_path_to_load}")
         elif os.path.isdir(os.path.join(keye_dir, search_name)):
             model_path_to_load = os.path.join(keye_dir, search_name)
-            print(
-                f"Keye-VL: Found model in custom directory: {model_path_to_load}")
+            print(f"Keye-VL: Found model in custom directory: {model_path_to_load}")
 
         if model_path_to_load is None and is_repo_id:
             if auto_download == "enable":
-                print(
-                    f"Keye-VL: Local model not found. Downloading from Hugging Face repo: {model_name}")
+                print(f"Keye-VL: Local model not found. Downloading from Hugging Face repo: {model_name}")
                 model_path_to_load = self.download_model(model_name)
             else:
                 model_path_to_load = model_name
-                print(
-                    f"Keye-VL: Will attempt to load from Hugging Face repo: {model_path_to_load}")
+                print(f"Keye-VL: Will attempt to load from Hugging Face repo: {model_path_to_load}")
 
         if model_path_to_load is None:
-            raise FileNotFoundError(
-                f"Keye-VL model '{model_name}' not found. Please check the name or enable auto-download.")
+            raise FileNotFoundError(f"Keye-VL model '{model_name}' not found. Please check the name or enable auto-download.")
 
         try:
             model_load_kwargs = {
@@ -269,22 +259,14 @@ class KeyeModelLoader:
             }
 
             if not has_quant_config and quantization != "none":
-                print(
-                    f"Keye-VL: Applying {quantization} quantization on-the-fly.")
+                print(f"Keye-VL: Applying {quantization} quantization on-the-fly.")
                 if quantization == "4bit":
-                    quant_config = BitsAndBytesConfig(
-                        load_in_4bit=True,
-                        bnb_4bit_quant_type="nf4",
-                        bnb_4bit_use_double_quant=True,
-                        bnb_4bit_compute_dtype=dtype if dtype != "auto" else torch.bfloat16
-                    )
+                    quant_config = BitsAndBytesConfig(load_in_4bit=True, bnb_4bit_quant_type="nf4", bnb_4bit_use_double_quant=True, bnb_4bit_compute_dtype=dtype if dtype != "auto" else torch.bfloat16)
                 else:
                     quant_config = BitsAndBytesConfig(load_in_8bit=True)
                 model_load_kwargs["quantization_config"] = quant_config
 
-            processor_load_kwargs = {
-                "trust_remote_code": True
-            }
+            processor_load_kwargs = {"trust_remote_code": True}
 
             if min_pixels > 0 and max_pixels > 0:
                 processor_load_kwargs["min_pixels"] = min_pixels
@@ -300,10 +282,8 @@ class KeyeModelLoader:
             device_mapping = "cpu" if device == "cpu" else "auto"
             model_load_kwargs["device_map"] = device_mapping
 
-            self.model = AutoModel.from_pretrained(
-                model_path_to_load, **model_load_kwargs).eval()
-            self.processor = AutoProcessor.from_pretrained(
-                model_path_to_load, **processor_load_kwargs)
+            self.model = AutoModel.from_pretrained(model_path_to_load, **model_load_kwargs).eval()
+            self.processor = AutoProcessor.from_pretrained(model_path_to_load, **processor_load_kwargs)
 
             self.cached_params = current_params
 
@@ -311,6 +291,7 @@ class KeyeModelLoader:
         except Exception as e:
             print(f"Error loading Keye-VL model: {str(e)}")
             import traceback
+
             traceback.print_exc()
             raise e
 
@@ -334,16 +315,15 @@ class KeyeNode:
                 "seed": ("INT", {"default": 0, "min": 0, "max": 0xFFFFFFFFFFFFFFFF}),
             },
             "optional": {
-                "min_pixels": ("INT", {"default": 256*28*28, "min": 0}),
-                "max_pixels": ("INT", {"default": 1280*28*28, "min": 0}),
+                "min_pixels": ("INT", {"default": 256 * 28 * 28, "min": 0}),
+                "max_pixels": ("INT", {"default": 1280 * 28 * 28, "min": 0}),
                 "resized_height": ("INT", {"default": 0, "min": 0}),
                 "resized_width": ("INT", {"default": 0, "min": 0}),
-            }
+            },
         }
 
     RETURN_TYPES = ("STRING", "STRING", "STRING", "STRING")
-    RETURN_NAMES = ("text", "thinking",
-                    "text_list", "thinking_list")
+    RETURN_NAMES = ("text", "thinking", "text_list", "thinking_list")
     OUTPUT_IS_LIST = (False, False, True, True)
     FUNCTION = "generate_text"
     CATEGORY = "VL-Nodes/Keye-VL"
@@ -364,27 +344,25 @@ class KeyeNode:
 
         original_device = model.device
 
-        is_quantized = getattr(model, 'is_loaded_in_8bit', False) or getattr(
-            model, 'is_loaded_in_4bit', False)
+        is_quantized = getattr(model, "is_loaded_in_8bit", False) or getattr(model, "is_loaded_in_4bit", False)
 
         # Handle device transitions for quantized models
-        if is_quantized and original_device.type == 'cpu' and device == "cuda":
-            print("Warning: Quantized Keye-VL models (4/8-bit) cannot be moved from CPU to CUDA after loading. "
-                  "Model will remain on CPU for inference.")
+        if is_quantized and original_device.type == "cpu" and device == "cuda":
+            print("Warning: Quantized Keye-VL models (4/8-bit) cannot be moved from CPU to CUDA after loading. Model will remain on CPU for inference.")
             inference_device = torch.device("cpu")
 
         # For non-quantized models, move to the inference device if needed
-        model_on_cpu = original_device.type == 'cpu'
-        target_device_is_cuda = inference_device.type == 'cuda'
+        model_on_cpu = original_device.type == "cpu"
+        target_device_is_cuda = inference_device.type == "cuda"
         gpu_available = target_device_is_cuda and torch.cuda.is_available()
 
         # Check if model can be moved (not offloaded by accelerate)
         can_move_model = True
         try:
             # Check if model has any modules offloaded to cpu or disk
-            if hasattr(model, 'hf_device_map'):
+            if hasattr(model, "hf_device_map"):
                 for _, module_device in model.hf_device_map.items():
-                    if module_device in ['cpu', 'disk']:
+                    if module_device in ["cpu", "disk"]:
                         can_move_model = False
                         break
         except Exception:
@@ -393,18 +371,15 @@ class KeyeNode:
 
         moved_to_target = False
         if model_on_cpu and gpu_available and not is_quantized and can_move_model:
-            print(
-                f"Keye-VL: Moving model from {original_device} to {inference_device} for inference.")
+            print(f"Keye-VL: Moving model from {original_device} to {inference_device} for inference.")
             model.to(inference_device)
             moved_to_target = True
         elif not model_on_cpu and device == "cpu" and can_move_model:
-            print(
-                f"Keye-VL: Moving model from {original_device} to CPU for inference.")
+            print(f"Keye-VL: Moving model from {original_device} to CPU for inference.")
             model.to(torch.device("cpu"))
             moved_to_target = True
         elif not can_move_model:
-            print(
-                f"Keye-VL: Model has modules offloaded by accelerate, using current device {original_device} for inference.")
+            print(f"Keye-VL: Model has modules offloaded by accelerate, using current device {original_device} for inference.")
             inference_device = original_device
 
         current_inference_device = model.device
@@ -418,7 +393,7 @@ class KeyeNode:
             print(f"Keye-VL: Batch size: {batch_size}")
 
             for i in range(batch_size):
-                print(f"Keye-VL: Processing image {i+1}/{batch_size}")
+                print(f"Keye-VL: Processing image {i + 1}/{batch_size}")
                 pil_image = pil_images[i]
 
                 # Convert PIL image to base64
@@ -448,25 +423,24 @@ class KeyeNode:
                         image_content["min_pixels"] = min_pixels
                         image_content["max_pixels"] = max_pixels
 
-                messages = [{
-                    "role": "user",
-                    "content": [
-                        image_content,
-                        {"type": "text", "text": final_prompt},
-                    ],
-                }]
+                messages = [
+                    {
+                        "role": "user",
+                        "content": [
+                            image_content,
+                            {"type": "text", "text": final_prompt},
+                        ],
+                    }
+                ]
 
-                text = processor.apply_chat_template(
-                    messages, tokenize=False, add_generation_prompt=True
-                )
+                text = processor.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
 
                 result = process_vision_info(messages)
                 # Handle both 2-tuple and 3-tuple returns from process_vision_info
                 if isinstance(result, tuple) and len(result) >= 2:
                     image_inputs, video_inputs = result[0], result[1]
                 else:
-                    raise ValueError(
-                        f"Unexpected return value from process_vision_info: {result}")
+                    raise ValueError(f"Unexpected return value from process_vision_info: {result}")
 
                 inputs = processor(
                     text=[text],
@@ -487,24 +461,19 @@ class KeyeNode:
 
                 with torch.inference_mode():
                     generated_ids = model.generate(**inputs, **gen_kwargs)
-                    generated_ids_trimmed = [
-                        out_ids[len(in_ids):] for in_ids, out_ids in zip(inputs.input_ids, generated_ids)
-                    ]
-                    output_text = processor.batch_decode(
-                        generated_ids_trimmed, skip_special_tokens=True, clean_up_tokenization_spaces=False
-                    )[0]
+                    generated_ids_trimmed = [out_ids[len(in_ids) :] for in_ids, out_ids in zip(inputs.input_ids, generated_ids)]
+                    output_text = processor.batch_decode(generated_ids_trimmed, skip_special_tokens=True, clean_up_tokenization_spaces=False)[0]
 
                 # Process output based on thinking mode
                 import re
+
                 thinking_analysis_text = ""
 
                 # Handle thinking mode output
                 if thinking_mode == "Thinking":
                     # Extract content from <think> and <answer> tags
-                    think_match = re.search(
-                        r'<think>(.*?)</think>', output_text, re.DOTALL)
-                    answer_match = re.search(
-                        r'<answer>(.*?)</answer>', output_text, re.DOTALL)
+                    think_match = re.search(r"<think>(.*?)</think>", output_text, re.DOTALL)
+                    answer_match = re.search(r"<answer>(.*?)</answer>", output_text, re.DOTALL)
 
                     if think_match:
                         thinking_analysis_text = think_match.group(1).strip()
@@ -512,52 +481,44 @@ class KeyeNode:
                         output_text = answer_match.group(1).strip()
                     else:
                         # If no <answer> tag, remove <think> tag content and use remaining text
-                        output_text = re.sub(
-                            r'<think>.*?</think>', '', output_text, flags=re.DOTALL).strip()
+                        output_text = re.sub(r"<think>.*?</think>", "", output_text, flags=re.DOTALL).strip()
                 elif thinking_mode == "Auto":
                     # Handle auto mode - could have analysis text and/or thinking tags
-                    analysis_match = re.search(
-                        r'<analysis>.*?</analysis>', output_text, re.DOTALL)
-                    think_match = re.search(
-                        r'<think>(.*?)</think>', output_text, re.DOTALL)
-                    answer_match = re.search(
-                        r'<answer>(.*?)</answer>', output_text, re.DOTALL)
+                    analysis_match = re.search(r"<analysis>.*?</analysis>", output_text, re.DOTALL)
+                    think_match = re.search(r"<think>(.*?)</think>", output_text, re.DOTALL)
+                    answer_match = re.search(r"<answer>(.*?)</answer>", output_text, re.DOTALL)
 
                     # Extract analysis text if present
                     if analysis_match:
-                        thinking_analysis_text = analysis_match.group(
-                            0).strip()
+                        thinking_analysis_text = analysis_match.group(0).strip()
 
                     # Handle thinking tags if present
                     if think_match:
                         # Append thinking content to analysis text
                         if thinking_analysis_text:
-                            thinking_analysis_text += "\n\n" + \
-                                think_match.group(1).strip()
+                            thinking_analysis_text += "\n\n" + think_match.group(1).strip()
                         else:
-                            thinking_analysis_text = think_match.group(
-                                1).strip()
+                            thinking_analysis_text = think_match.group(1).strip()
 
                     # Extract answer content if present, otherwise clean up the text
                     if answer_match:
                         output_text = answer_match.group(1).strip()
                     else:
                         # Remove analysis and thinking tags from output_text
-                        output_text = re.sub(
-                            r'<analysis>.*?</analysis>', '', output_text, flags=re.DOTALL).strip()
-                        output_text = re.sub(
-                            r'<think>.*?</think>', '', output_text, flags=re.DOTALL).strip()
+                        output_text = re.sub(r"<analysis>.*?</analysis>", "", output_text, flags=re.DOTALL).strip()
+                        output_text = re.sub(r"<think>.*?</think>", "", output_text, flags=re.DOTALL).strip()
 
                 if special_captioning_token and special_captioning_token.strip():
                     output_text = f"{special_captioning_token.strip()}, {output_text}"
 
-                output_text = ' '.join(output_text.split())
+                output_text = " ".join(output_text.split())
                 output_texts.append(output_text.strip())
                 thinking_analysis_texts.append(thinking_analysis_text.strip())
 
         except Exception as e:
             print(f"Error generating text with Keye-VL: {str(e)}")
             import traceback
+
             traceback.print_exc()
             output_texts.append(f"Error: {str(e)}")
             thinking_analysis_texts.append("")

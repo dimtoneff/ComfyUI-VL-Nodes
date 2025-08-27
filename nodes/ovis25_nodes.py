@@ -10,8 +10,7 @@ import folder_paths
 from ..utils import tensor2pil, resize_pil_image, find_local_unet_models, hash_seed
 
 # Create a directory for Ovis-2.5 models
-ovis25_dir = os.path.join(
-    folder_paths.get_folder_paths("unet")[0], "Ovis2.5-HF")
+ovis25_dir = os.path.join(folder_paths.get_folder_paths("unet")[0], "Ovis2.5-HF")
 os.makedirs(ovis25_dir, exist_ok=True)
 
 _ovis25_loader_instances = []
@@ -74,7 +73,7 @@ class Ovis25ModelLoader:
         print("Ovis-2.5: Unloading model.")
 
         try:
-            self.model.to(device='cpu')
+            self.model.to(device="cpu")
         except Exception as e:
             print(f"Ovis-2.5: Warning - could not move model to CPU: {e}")
 
@@ -89,7 +88,7 @@ class Ovis25ModelLoader:
             torch.cuda.empty_cache()
 
     def download_model(self, model_name):
-        local_dir = os.path.join(ovis25_dir, model_name.split('/')[-1])
+        local_dir = os.path.join(ovis25_dir, model_name.split("/")[-1])
         print(f"Downloading Ovis-2.5 model: {model_name} to {local_dir}")
         try:
             snapshot_download(repo_id=model_name, local_dir=local_dir)
@@ -97,8 +96,7 @@ class Ovis25ModelLoader:
             return local_dir
         except Exception as e:
             print(f"Error downloading model: {str(e)}")
-            raise RuntimeError(
-                f"Failed to download model {model_name}. Error: {str(e)}")
+            raise RuntimeError(f"Failed to download model {model_name}. Error: {str(e)}")
 
     def load_model(self, model_name, precision, device, auto_download):
         current_params = {
@@ -125,16 +123,15 @@ class Ovis25ModelLoader:
         else:
             dtype = torch.float32
 
-        is_repo_id = '/' in model_name
+        is_repo_id = "/" in model_name
         model_path_to_load = None
 
         # Determine the name to search for locally.
-        search_name = model_name.split('/')[-1]
+        search_name = model_name.split("/")[-1]
 
         # Use the utility to find all local models and their paths.
         local_models, local_model_paths = find_local_unet_models("ovis2.5")
-        path_map = {name: path for name, path in zip(
-            local_models, local_model_paths)}
+        path_map = {name: path for name, path in zip(local_models, local_model_paths)}
 
         if search_name in path_map:
             model_path_to_load = path_map[search_name]
@@ -143,17 +140,14 @@ class Ovis25ModelLoader:
         # If not found locally and it's a repo_id, handle download or direct HF loading.
         if model_path_to_load is None and is_repo_id:
             if auto_download == "enable":
-                print(
-                    f"Ovis-2.5: Local model not found. Downloading from Hugging Face repo: {model_name}")
+                print(f"Ovis-2.5: Local model not found. Downloading from Hugging Face repo: {model_name}")
                 model_path_to_load = self.download_model(model_name)
             else:
                 model_path_to_load = model_name
-                print(
-                    f"Ovis-2.5: Will attempt to load from Hugging Face repo: {model_path_to_load}")
+                print(f"Ovis-2.5: Will attempt to load from Hugging Face repo: {model_path_to_load}")
 
         if model_path_to_load is None:
-            raise FileNotFoundError(
-                f"Ovis-2.5 model '{model_name}' not found in any of the 'unet' directories: {folder_paths.get_folder_paths('unet')}")
+            raise FileNotFoundError(f"Ovis-2.5 model '{model_name}' not found in any of the 'unet' directories: {folder_paths.get_folder_paths('unet')}")
 
         try:
             load_kwargs = {
@@ -164,8 +158,7 @@ class Ovis25ModelLoader:
             device_mapping = "cpu" if device == "cpu" else "auto"
             load_kwargs["device_map"] = device_mapping
 
-            self.model = AutoModelForCausalLM.from_pretrained(
-                model_path_to_load, **load_kwargs).eval()
+            self.model = AutoModelForCausalLM.from_pretrained(model_path_to_load, **load_kwargs).eval()
             self.text_tokenizer = self.model.text_tokenizer
             self.cached_params = current_params
 
@@ -173,6 +166,7 @@ class Ovis25ModelLoader:
         except Exception as e:
             print(f"Error loading Ovis-2.5 model: {str(e)}")
             import traceback
+
             traceback.print_exc()
             raise e
 
@@ -186,7 +180,7 @@ class Ovis25ImageToText:
                 "image": ("IMAGE",),
                 "prompt": ("STRING", {"default": "Describe this image in detail.", "multiline": True}),
                 "special_captioning_token": ("STRING", {"default": "", "multiline": False}),
-                "seed": ("INT", {"default": 69, "min": 1, "max": 0xffffffffffffffff}),
+                "seed": ("INT", {"default": 69, "min": 1, "max": 0xFFFFFFFFFFFFFFFF}),
                 "resize_image": ("BOOLEAN", {"default": True, "label_on": "Resize Enabled", "label_off": "Resize Disabled"}),
                 "enable_thinking": ("BOOLEAN", {"default": True}),
                 "enable_thinking_budget": ("BOOLEAN", {"default": True}),
@@ -204,7 +198,7 @@ class Ovis25ImageToText:
     FUNCTION = "generate_text"
     CATEGORY = "VL-Nodes/Ovis-2.5"
 
-    def generate_text(self, ovis25_model, image, prompt,  special_captioning_token, seed, resize_image, enable_thinking, enable_thinking_budget, max_new_tokens, thinking_budget, temperature, top_p, do_sample):
+    def generate_text(self, ovis25_model, image, prompt, special_captioning_token, seed, resize_image, enable_thinking, enable_thinking_budget, max_new_tokens, thinking_budget, temperature, top_p, do_sample):
         model_data = ovis25_model
         model = model_data["model"]
         text_tokenizer = model_data["text_tokenizer"]
@@ -213,13 +207,12 @@ class Ovis25ImageToText:
         inference_device = comfy.model_management.get_torch_device()
         original_device = model.device
 
-        model_on_cpu = original_device.type == 'cpu'
-        gpu_available = inference_device.type == 'cuda'
+        model_on_cpu = original_device.type == "cpu"
+        gpu_available = inference_device.type == "cuda"
 
         moved_to_gpu = False
         if model_on_cpu and gpu_available:
-            print(
-                f"Ovis-2.5: Moving model from {original_device} to {inference_device} for inference.")
+            print(f"Ovis-2.5: Moving model from {original_device} to {inference_device} for inference.")
             model.to(inference_device)
             moved_to_gpu = True
 
@@ -240,32 +233,27 @@ class Ovis25ImageToText:
                 thinking_text = ""
                 final_text = ""
 
-                print(f"Ovis-2.5 Caption: Processing image {i+1}/{batch_size}")
+                print(f"Ovis-2.5 Caption: Processing image {i + 1}/{batch_size}")
 
                 try:
                     if resize_image:
-                        pil_image = resize_pil_image(
-                            pil_image, target_size=512, node_name="Ovis25ImageToText")
+                        pil_image = resize_pil_image(pil_image, target_size=512, node_name="Ovis25ImageToText")
 
-                    messages = [{
-                        "role": "user",
-                        "content": [
-                            {"type": "image", "image": pil_image},
-                            {"type": "text", "text": prompt},
-                        ],
-                    }]
+                    messages = [
+                        {
+                            "role": "user",
+                            "content": [
+                                {"type": "image", "image": pil_image},
+                                {"type": "text", "text": prompt},
+                            ],
+                        }
+                    ]
 
-                    input_ids, pixel_values, grid_thws = model.preprocess_inputs(
-                        messages=messages,
-                        add_generation_prompt=True,
-                        enable_thinking=enable_thinking
-                    )
+                    input_ids, pixel_values, grid_thws = model.preprocess_inputs(messages=messages, add_generation_prompt=True, enable_thinking=enable_thinking)
 
                     input_ids = input_ids.to(device=current_inference_device)
-                    pixel_values = pixel_values.to(
-                        device=current_inference_device, dtype=dtype) if pixel_values is not None else None
-                    grid_thws = grid_thws.to(
-                        device=current_inference_device) if grid_thws is not None else None
+                    pixel_values = pixel_values.to(device=current_inference_device, dtype=dtype) if pixel_values is not None else None
+                    grid_thws = grid_thws.to(device=current_inference_device) if grid_thws is not None else None
 
                     do_sample_bool = do_sample.lower() == "true"
 
@@ -283,34 +271,27 @@ class Ovis25ImageToText:
                     }
 
                     with torch.inference_mode(), autocast(device_type=current_inference_device.type, dtype=dtype):
-                        outputs = model.generate(
-                            inputs=input_ids,
-                            pixel_values=pixel_values,
-                            grid_thws=grid_thws,
-                            **gen_kwargs
-                        )
-                        response = text_tokenizer.decode(
-                            outputs[0], skip_special_tokens=True)
+                        outputs = model.generate(inputs=input_ids, pixel_values=pixel_values, grid_thws=grid_thws, **gen_kwargs)
+                        response = text_tokenizer.decode(outputs[0], skip_special_tokens=True)
 
-                    think_match = re.search(
-                        r'<think>(.*?)</think>', response, re.DOTALL)
+                    think_match = re.search(r"<think>(.*?)</think>", response, re.DOTALL)
                     if think_match:
                         thinking_text = think_match.group(1).strip()
-                        final_text = response.replace(
-                            think_match.group(0), '').strip()
+                        final_text = response.replace(think_match.group(0), "").strip()
                     else:
                         final_text = response.strip()
 
                 except Exception as e:
                     print(f"Error generating text with Ovis-2.5: {str(e)}")
                     import traceback
+
                     traceback.print_exc()
                     thinking_text = f"Error: {str(e)}"
 
                 if special_captioning_token and special_captioning_token.strip():
                     final_text = f"{special_captioning_token.strip()}, {final_text}"
 
-                final_text = ' '.join(final_text.split())
+                final_text = " ".join(final_text.split())
                 texts.append(final_text.strip('"'))
                 thinkings.append(thinking_text)
 

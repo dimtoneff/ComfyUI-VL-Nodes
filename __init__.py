@@ -1,10 +1,11 @@
 # import atexit
-from .nodes.mimo_nodes import NODE_CLASS_MAPPINGS, NODE_DISPLAY_NAME_MAPPINGS, unload_all_mimo_models
+from .nodes.gguf_nodes import NODE_CLASS_MAPPINGS, NODE_DISPLAY_NAME_MAPPINGS, unload_all_gguf_models
 from .nodes.lfm2_nodes import NODE_CLASS_MAPPINGS as LFM2_NODE_CLASS_MAPPINGS, NODE_DISPLAY_NAME_MAPPINGS as LFM2_NODE_DISPLAY_NAME_MAPPINGS, unload_all_lfm2_hf_models
 from .nodes.ovisu1_nodes import NODE_CLASS_MAPPINGS as OVISU1_NODE_CLASS_MAPPINGS, NODE_DISPLAY_NAME_MAPPINGS as OVISU1_NODE_DISPLAY_NAME_MAPPINGS, unload_all_ovisu1_models
 from .nodes.ovis25_nodes import NODE_CLASS_MAPPINGS as OVIS25_NODE_CLASS_MAPPINGS, NODE_DISPLAY_NAME_MAPPINGS as OVIS25_NODE_DISPLAY_NAME_MAPPINGS, unload_all_ovis25_models
 from .nodes.general_nodes import NODE_CLASS_MAPPINGS as GENERAL_NODE_CLASS_MAPPINGS, NODE_DISPLAY_NAME_MAPPINGS as GENERAL_NODE_DISPLAY_NAME_MAPPINGS
 from .nodes.keye_nodes import NODE_CLASS_MAPPINGS as KEYE_NODE_CLASS_MAPPINGS, NODE_DISPLAY_NAME_MAPPINGS as KEYE_NODE_DISPLAY_NAME_MAPPINGS, unload_all_keye_models
+from .nodes.internvl35_nodes import NODE_CLASS_MAPPINGS as INTERNVL_NODE_CLASS_MAPPINGS, NODE_DISPLAY_NAME_MAPPINGS as INTERNVL_NODE_DISPLAY_NAME_MAPPINGS, unload_all_internvl_models
 
 # Merge all node mappings
 NODE_CLASS_MAPPINGS.update(LFM2_NODE_CLASS_MAPPINGS)
@@ -12,24 +13,28 @@ NODE_CLASS_MAPPINGS.update(OVISU1_NODE_CLASS_MAPPINGS)
 NODE_CLASS_MAPPINGS.update(OVIS25_NODE_CLASS_MAPPINGS)
 NODE_CLASS_MAPPINGS.update(GENERAL_NODE_CLASS_MAPPINGS)
 NODE_CLASS_MAPPINGS.update(KEYE_NODE_CLASS_MAPPINGS)
+NODE_CLASS_MAPPINGS.update(INTERNVL_NODE_CLASS_MAPPINGS)
+
 # Merge all display name mappings
 NODE_DISPLAY_NAME_MAPPINGS.update(LFM2_NODE_DISPLAY_NAME_MAPPINGS)
 NODE_DISPLAY_NAME_MAPPINGS.update(OVISU1_NODE_DISPLAY_NAME_MAPPINGS)
 NODE_DISPLAY_NAME_MAPPINGS.update(OVIS25_NODE_DISPLAY_NAME_MAPPINGS)
 NODE_DISPLAY_NAME_MAPPINGS.update(GENERAL_NODE_DISPLAY_NAME_MAPPINGS)
 NODE_DISPLAY_NAME_MAPPINGS.update(KEYE_NODE_DISPLAY_NAME_MAPPINGS)
+NODE_DISPLAY_NAME_MAPPINGS.update(INTERNVL_NODE_DISPLAY_NAME_MAPPINGS)
 
 WEB_DIRECTORY = "./js"
 
 # def cleanup_models():
 #     print("ComfyUI-VL-Nodes: Server is shutting down. Unloading all models.")
-#     unload_all_mimo_models()
+#     unload_all_gguf_models()
 #     unload_all_lfm2_hf_models()
 #     unload_all_ovisu1_models()
 #     unload_all_ovis25_models()
+#     unload_all_keye_models()
+#     unload_all_internvl_models()
 
 
 # atexit.register(cleanup_models)
 
-__all__ = ['NODE_CLASS_MAPPINGS',
-           'NODE_DISPLAY_NAME_MAPPINGS', 'WEB_DIRECTORY']
+__all__ = ["NODE_CLASS_MAPPINGS", "NODE_DISPLAY_NAME_MAPPINGS", "WEB_DIRECTORY"]

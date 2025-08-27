@@ -1,8 +1,8 @@
 {
   "id": "bb0099a8-b11a-4af6-a46b-a00220b1ae5d",
   "revision": 0,
-  "last_node_id": 12,
-  "last_link_id": 18,
+  "last_node_id": 13,
+  "last_link_id": 20,
   "nodes": [
     {
       "id": 9,
@@ -110,7 +110,7 @@
           "name": "text",
           "type": "STRING",
           "links": [
-            16
+            19
           ]
         },
         {
@@ -123,13 +123,13 @@
         {
           "name": "text_list",
           "shape": 6,
-          "type": "LIST",
+          "type": "STRING",
           "links": null
         },
         {
           "name": "thinking_list",
           "shape": 6,
-          "type": "LIST",
+          "type": "STRING",
           "links": null
         }
       ],
@@ -141,7 +141,7 @@
       "widgets_values": [
         "You are an assistant who perfectly describes images. Fully describe the image as a prompt for Stable Diffusion text2image SDXL model. If you see nsfw stuff describe it too. Do not omit anything! Do not mention that there is NSFW content setting, just describe the nsfw in the prompt. !Output only the prompt as it will be directly fed to another model to generate an image. Be clear and use short sentences to describe the image!",
         "",
-        301149846858713,
+        613431929115598,
         "randomize",
         true,
         true,
@@ -171,7 +171,7 @@
         {
           "name": "text",
           "type": "STRING",
-          "link": 18
+          "link": 20
         }
       ],
       "outputs": [
@@ -190,45 +190,6 @@
       },
       "widgets_values": [
         "Two silhouetted figures stand on rocks, facing a calm body of water. The water reflects warm golden hues of a sunset or sunrise, with gentle ripples. Two small boats with people are on the water—one closer, one farther, both creating subtle wake trails. In the distance, layered mountain silhouettes frame the horizon, while the sky transitions from deep orange near the horizon to lighter tones above. The scene conveys a serene, golden-lit coastal or lakeside atmosphere."
-      ]
-    },
-    {
-      "id": 11,
-      "type": "MiMoFreeMemoryAPI",
-      "pos": [
-        171.054443359375,
-        793.7999877929688
-      ],
-      "size": [
-        270,
-        58
-      ],
-      "flags": {},
-      "order": 3,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "anything",
-          "type": "*",
-          "link": 16
-        }
-      ],
-      "outputs": [
-        {
-          "name": "output",
-          "type": "*",
-          "links": [
-            18
-          ]
-        }
-      ],
-      "properties": {
-        "cnr_id": "comfyui-vl-nodes",
-        "ver": "6ab7af32e11476b93ee4c8f99488c3f648c838b0",
-        "Node name for S&R": "MiMoFreeMemoryAPI"
-      },
-      "widgets_values": [
-        false
       ]
     },
     {
@@ -269,6 +230,45 @@
         "pexels-enesersahin-29529439.jpg",
         "image"
       ]
+    },
+    {
+      "id": 13,
+      "type": "VLNodesFreeMemoryAPI",
+      "pos": [
+        174.5453338623047,
+        790.636474609375
+      ],
+      "size": [
+        270,
+        58
+      ],
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "anything",
+          "type": "*",
+          "link": 19
+        }
+      ],
+      "outputs": [
+        {
+          "name": "output",
+          "type": "*",
+          "links": [
+            20
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfyui-vl-nodes",
+        "ver": "389fe97681de4045378f5acbe6ec52a2f58390eb",
+        "Node name for S&R": "VLNodesFreeMemoryAPI"
+      },
+      "widgets_values": [
+        false
+      ]
     }
   ],
   "links": [
@@ -289,14 +289,6 @@
       "IMAGE"
     ],
     [
-      16,
-      12,
-      0,
-      11,
-      0,
-      "*"
-    ],
-    [
       17,
       12,
       1,
@@ -305,8 +297,16 @@
       "STRING"
     ],
     [
-      18,
-      11,
+      19,
+      12,
+      0,
+      13,
+      0,
+      "*"
+    ],
+    [
+      20,
+      13,
       0,
       4,
       0,
@@ -319,7 +319,7 @@
     "ds": {
       "scale": 1.1,
       "offset": [
-        266.90923378684295,
+        267.6365509033202,
         -89.3637334650214
       ]
     },

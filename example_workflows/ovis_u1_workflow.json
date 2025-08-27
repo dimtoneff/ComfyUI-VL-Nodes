@@ -1,8 +1,8 @@
 {
   "id": "bb0099a8-b11a-4af6-a46b-a00220b1ae5d",
   "revision": 0,
-  "last_node_id": 7,
-  "last_link_id": 11,
+  "last_node_id": 10,
+  "last_link_id": 17,
   "nodes": [
     {
       "id": 3,
@@ -24,7 +24,7 @@
           "name": "IMAGE",
           "type": "IMAGE",
           "links": [
-            10
+            16
           ]
         },
         {
@@ -41,103 +41,6 @@
       "widgets_values": [
         "pexels-enesersahin-29529439.jpg",
         "image"
-      ]
-    },
-    {
-      "id": 6,
-      "type": "MiMoFreeMemoryAPI",
-      "pos": [
-        516.7999877929688,
-        223.40005493164062
-      ],
-      "size": [
-        270,
-        58
-      ],
-      "flags": {},
-      "order": 3,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "anything",
-          "type": "*",
-          "link": 11
-        }
-      ],
-      "outputs": [
-        {
-          "name": "output",
-          "type": "*",
-          "links": [
-            8
-          ]
-        }
-      ],
-      "properties": {
-        "cnr_id": "comfyui-vl-nodes",
-        "ver": "6ab7af32e11476b93ee4c8f99488c3f648c838b0",
-        "Node name for S&R": "MiMoFreeMemoryAPI"
-      },
-      "widgets_values": [
-        false
-      ]
-    },
-    {
-      "id": 7,
-      "type": "OvisU1ImageCaption",
-      "pos": [
-        470.39990234375,
-        323.4000244140625
-      ],
-      "size": [
-        349.5999755859375,
-        313.60003662109375
-      ],
-      "flags": {},
-      "order": 2,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "model",
-          "type": "OVIS_U1_MODEL",
-          "link": 9
-        },
-        {
-          "name": "image",
-          "type": "IMAGE",
-          "link": 10
-        }
-      ],
-      "outputs": [
-        {
-          "name": "text",
-          "type": "STRING",
-          "links": [
-            11
-          ]
-        },
-        {
-          "name": "text_list",
-          "shape": 6,
-          "type": "STRING",
-          "links": null
-        }
-      ],
-      "properties": {
-        "cnr_id": "comfyui-vl-nodes",
-        "ver": "1744cefa4de7463aa23edb0b2b94889498b1ef85",
-        "Node name for S&R": "OvisU1ImageCaption"
-      },
-      "widgets_values": [
-        true,
-        "You are an assistant who perfectly describes images. Fully describe the image as a prompt for Stable Diffusion text2image SDXL model. If you see nsfw stuff describe it too. Do not omit anything! Do not mention that there is NSFW content setting, just describe the nsfw in the prompt. !Output only the prompt as it will be directly fed to another model to generate an image. Be clear and use short sentences to describe the image!",
-        "",
-        242215985471398,
-        "randomize",
-        512,
-        0.5,
-        0.91,
-        "false"
       ]
     },
     {
@@ -158,7 +61,7 @@
         {
           "name": "text",
           "type": "STRING",
-          "link": 8
+          "link": 13
         }
       ],
       "outputs": [
@@ -179,11 +82,11 @@
       ]
     },
     {
-      "id": 2,
-      "type": "OvisU1ModelLoader",
+      "id": 9,
+      "type": "OvisU1VLModelLoader",
       "pos": [
-        185.5999755859375,
-        322.60003662109375
+        189.29519653320312,
+        310.4689636230469
       ],
       "size": [
         270,
@@ -198,15 +101,14 @@
           "name": "model",
           "type": "OVIS_U1_MODEL",
           "links": [
-            9
+            15
           ]
         }
       ],
       "properties": {
         "cnr_id": "comfyui-vl-nodes",
-        "ver": "8e0e876a96488dabe86f09d3696364ef74d1b52e",
-        "Node name for S&R": "OvisU1ModelLoader",
-        "aux_id": "dimtoneff/ComfyUI-VL-Nodes"
+        "ver": "389fe97681de4045378f5acbe6ec52a2f58390eb",
+        "Node name for S&R": "OvisU1VLModelLoader"
       },
       "widgets_values": [
         "AIDC-AI/Ovis-U1-3B",
@@ -215,38 +117,135 @@
         "cuda",
         "enable"
       ]
+    },
+    {
+      "id": 8,
+      "type": "VLNodesFreeMemoryAPI",
+      "pos": [
+        491.6242370605469,
+        231.1300506591797
+      ],
+      "size": [
+        270,
+        58
+      ],
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "anything",
+          "type": "*",
+          "link": 17
+        }
+      ],
+      "outputs": [
+        {
+          "name": "output",
+          "type": "*",
+          "links": [
+            13
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfyui-vl-nodes",
+        "ver": "389fe97681de4045378f5acbe6ec52a2f58390eb",
+        "Node name for S&R": "VLNodesFreeMemoryAPI"
+      },
+      "widgets_values": [
+        false
+      ]
+    },
+    {
+      "id": 10,
+      "type": "OvisU1ImageCaption",
+      "pos": [
+        469.3855285644531,
+        330.90478515625
+      ],
+      "size": [
+        344.7032470703125,
+        307.81365966796875
+      ],
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "model",
+          "type": "OVIS_U1_MODEL",
+          "link": 15
+        },
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "link": 16
+        }
+      ],
+      "outputs": [
+        {
+          "name": "text",
+          "type": "STRING",
+          "links": [
+            17
+          ]
+        },
+        {
+          "name": "text_list",
+          "shape": 6,
+          "type": "STRING",
+          "links": null
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfyui-vl-nodes",
+        "ver": "389fe97681de4045378f5acbe6ec52a2f58390eb",
+        "Node name for S&R": "OvisU1ImageCaption"
+      },
+      "widgets_values": [
+        true,
+        "Describe this imaYou are an assistant who perfectly describes images. Fully describe the image as a prompt for Stable Diffusion text2image SDXL model. If you see nsfw stuff describe it too. Do not omit anything! Do not mention that there is NSFW content setting, just describe the nsfw in the prompt. !Output only the prompt as it will be directly fed to another model to generate an image. Be clear and use short sentences to describe the image!ge in detail.",
+        "",
+        46581589344475,
+        "randomize",
+        512,
+        0.5,
+        0.9,
+        "false"
+      ]
     }
   ],
   "links": [
     [
+      13,
       8,
-      6,
       0,
       4,
       0,
       "STRING"
     ],
     [
+      15,
       9,
-      2,
       0,
-      7,
+      10,
       0,
       "OVIS_U1_MODEL"
     ],
     [
-      10,
+      16,
       3,
       0,
-      7,
+      10,
       1,
       "IMAGE"
     ],
     [
-      11,
-      7,
+      17,
+      10,
       0,
-      6,
+      8,
       0,
       "*"
     ]
@@ -257,7 +256,7 @@
     "ds": {
       "scale": 1.3310000000000004,
       "offset": [
-        56.53500950882766,
+        57.136098034841936,
         -68.09483422237095
       ]
     },

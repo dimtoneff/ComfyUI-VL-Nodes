@@ -1,48 +1,9 @@
 {
   "id": "bb0099a8-b11a-4af6-a46b-a00220b1ae5d",
   "revision": 0,
-  "last_node_id": 13,
-  "last_link_id": 23,
+  "last_node_id": 14,
+  "last_link_id": 25,
   "nodes": [
-    {
-      "id": 6,
-      "type": "MiMoFreeMemoryAPI",
-      "pos": [
-        189.9937286376953,
-        193.02944946289062
-      ],
-      "size": [
-        270,
-        58
-      ],
-      "flags": {},
-      "order": 3,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "anything",
-          "type": "*",
-          "link": 21
-        }
-      ],
-      "outputs": [
-        {
-          "name": "output",
-          "type": "*",
-          "links": [
-            12
-          ]
-        }
-      ],
-      "properties": {
-        "cnr_id": "comfyui-vl-nodes",
-        "ver": "6ab7af32e11476b93ee4c8f99488c3f648c838b0",
-        "Node name for S&R": "MiMoFreeMemoryAPI"
-      },
-      "widgets_values": [
-        false
-      ]
-    },
     {
       "id": 3,
       "type": "LoadImage",
@@ -113,7 +74,7 @@
           "name": "text",
           "type": "STRING",
           "links": [
-            21
+            24
           ]
         },
         {
@@ -177,7 +138,7 @@
         {
           "name": "text",
           "type": "STRING",
-          "link": 12
+          "link": 25
         }
       ],
       "outputs": [
@@ -276,17 +237,48 @@
         1003520,
         "enable"
       ]
+    },
+    {
+      "id": 14,
+      "type": "VLNodesFreeMemoryAPI",
+      "pos": [
+        185.81564331054688,
+        198.56959533691406
+      ],
+      "size": [
+        270,
+        58
+      ],
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "anything",
+          "type": "*",
+          "link": 24
+        }
+      ],
+      "outputs": [
+        {
+          "name": "output",
+          "type": "*",
+          "links": [
+            25
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfyui-vl-nodes",
+        "ver": "389fe97681de4045378f5acbe6ec52a2f58390eb",
+        "Node name for S&R": "VLNodesFreeMemoryAPI"
+      },
+      "widgets_values": [
+        false
+      ]
     }
   ],
   "links": [
-    [
-      12,
-      6,
-      0,
-      4,
-      0,
-      "STRING"
-    ],
     [
       20,
       3,
@@ -294,14 +286,6 @@
       13,
       1,
       "IMAGE"
-    ],
-    [
-      21,
-      13,
-      0,
-      6,
-      0,
-      "*"
     ],
     [
       22,
@@ -318,6 +302,22 @@
       13,
       0,
       "KEYE_MODEL"
+    ],
+    [
+      24,
+      13,
+      0,
+      14,
+      0,
+      "*"
+    ],
+    [
+      25,
+      14,
+      0,
+      4,
+      0,
+      "STRING"
     ]
   ],
   "groups": [],

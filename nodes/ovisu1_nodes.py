@@ -1,19 +1,20 @@
-
-import os
-import torch
 import gc
+import os
+
+import torch
+from huggingface_hub import snapshot_download
+from torch.amp.autocast_mode import autocast
 from transformers import AutoModelForCausalLM, AutoTokenizer, set_seed
 from transformers.models.auto.configuration_auto import CONFIG_MAPPING
 from transformers.utils.quantization_config import BitsAndBytesConfig
-from huggingface_hub import snapshot_download
-from torch.amp.autocast_mode import autocast
+
 import comfy.model_management
 import folder_paths
-from ..utils import tensor2pil, resize_pil_image, find_local_unet_models, hash_seed
+
+from ..utils import find_local_unet_models, hash_seed, resize_pil_image, tensor2pil
 
 # Create a directory for Ovis-U1 models
-ovis_u1_dir = os.path.join(
-    folder_paths.get_folder_paths("unet")[0], "Ovis-U1-HF")
+ovis_u1_dir = os.path.join(folder_paths.get_folder_paths("unet")[0], "Ovis-U1-HF")
 os.makedirs(ovis_u1_dir, exist_ok=True)
 
 _ovisu1_loader_instances = []
@@ -78,8 +79,7 @@ class OvisU1VLModelLoader:
 
         print("Ovis-U1: Unloading model.")
 
-        is_quantized = getattr(self.model, 'is_loaded_in_8bit', False) or getattr(
-            self.model, 'is_loaded_in_4bit', False)
+        is_quantized = getattr(self.model, "is_loaded_in_8bit", False) or getattr(self.model, "is_loaded_in_4bit", False)
 
         if is_quantized:
             print("Ovis-U1: De-initializing quantized model to free VRAM...")
@@ -91,9 +91,9 @@ class OvisU1VLModelLoader:
                         if isinstance(child, (bnb.nn.Linear4bit, bnb.nn.Linear8bitLt)):
                             # Deleting the weight and bias from the child module
                             # can help trigger deallocation.
-                            if hasattr(child, 'weight'):
+                            if hasattr(child, "weight"):
                                 del child.weight
-                            if hasattr(child, 'bias') and child.bias is not None:
+                            if hasattr(child, "bias") and child.bias is not None:
                                 del child.bias
 
                             # Replacing with an empty module to break references
@@ -102,15 +102,13 @@ class OvisU1VLModelLoader:
                             _replace_with_empty(child)
 
                 _replace_with_empty(self.model)
-                print(
-                    "Ovis-U1: Replaced quantized layers with empty modules to aid memory release.")
+                print("Ovis-U1: Replaced quantized layers with empty modules to aid memory release.")
             except Exception as e:
-                print(
-                    f"Ovis-U1: Could not perform deep clean of quantized model, proceeding with standard unload. Error: {e}")
+                print(f"Ovis-U1: Could not perform deep clean of quantized model, proceeding with standard unload. Error: {e}")
         else:
             try:
                 # For regular models, move to CPU to ensure VRAM is released before deleting
-                self.model.to(device='cpu')
+                self.model.to(device="cpu")
             except Exception as e:
                 print(f"Ovis-U1: Warning - could not move model to CPU: {e}")
 
@@ -128,20 +126,16 @@ class OvisU1VLModelLoader:
 
     def download_model(self, model_name):
         """Download the model files from Hugging Face if they don't exist locally."""
-        local_dir = os.path.join(ovis_u1_dir, model_name.split('/')[-1])
+        local_dir = os.path.join(ovis_u1_dir, model_name.split("/")[-1])
 
         print(f"Downloading Ovis-U1 model: {model_name} to {local_dir}")
         try:
-            snapshot_download(
-                repo_id=model_name,
-                local_dir=local_dir
-            )
+            snapshot_download(repo_id=model_name, local_dir=local_dir)
             print(f"Successfully downloaded {model_name} to {local_dir}")
             return local_dir
         except Exception as e:
             print(f"Error downloading model: {str(e)}")
-            raise RuntimeError(
-                f"Failed to download model {model_name}. Error: {str(e)}")
+            raise RuntimeError(f"Failed to download model {model_name}. Error: {str(e)}")
 
     def load_model(self, model_name, quantization, precision, device, auto_download):
         current_params = {
@@ -164,15 +158,13 @@ class OvisU1VLModelLoader:
         original_from_pretrained = AutoTokenizer.from_pretrained
 
         def patched_from_pretrained_impl(cls, pretrained_model_name_or_path, *inputs, **kwargs):
-            print(
-                "OvisU1-Loader: Using patched AutoTokenizer.from_pretrained to force trust_remote_code=True")
-            kwargs['trust_remote_code'] = True
+            print("OvisU1-Loader: Using patched AutoTokenizer.from_pretrained to force trust_remote_code=True")
+            kwargs["trust_remote_code"] = True
             # The original method is already bound to the class, so we call it directly.
             return original_from_pretrained(pretrained_model_name_or_path, *inputs, **kwargs)
 
         # The original from_pretrained is a classmethod, so we need to wrap our patch similarly.
-        AutoTokenizer.from_pretrained = classmethod(
-            patched_from_pretrained_impl)
+        AutoTokenizer.from_pretrained = classmethod(patched_from_pretrained_impl)
 
         # Monkey-patch CONFIG_MAPPING.register to handle re-registration of 'aimv2'
         # The Ovis-U1 model's remote code tries to register 'aimv2' every time it's loaded,
@@ -180,11 +172,11 @@ class OvisU1VLModelLoader:
         original_config_register = CONFIG_MAPPING.register
 
         def patched_config_register(key, value, exist_ok=False):
-            if key == 'aimv2':
-                print(
-                    "OvisU1-Loader: Patching CONFIG_MAPPING.register for 'aimv2' with exist_ok=True")
+            if key == "aimv2":
+                print("OvisU1-Loader: Patching CONFIG_MAPPING.register for 'aimv2' with exist_ok=True")
                 return original_config_register(key, value, exist_ok=True)
             return original_config_register(key, value, exist_ok=exist_ok)
+
         CONFIG_MAPPING.register = patched_config_register
 
         print(f"Loading Ovis-U1 model: {model_name}")
@@ -196,16 +188,15 @@ class OvisU1VLModelLoader:
         else:
             dtype = torch.float32
 
-        is_repo_id = '/' in model_name
+        is_repo_id = "/" in model_name
         model_path_to_load = None
 
         # Determine the name to search for locally.
-        search_name = model_name.split('/')[-1]
+        search_name = model_name.split("/")[-1]
 
         # Use the utility to find all local models and their paths.
         local_models, local_model_paths = find_local_unet_models("ovis-u1")
-        path_map = {name: path for name, path in zip(
-            local_models, local_model_paths)}
+        path_map = {name: path for name, path in zip(local_models, local_model_paths)}
 
         if search_name in path_map:
             model_path_to_load = path_map[search_name]
@@ -214,17 +205,14 @@ class OvisU1VLModelLoader:
         # If not found locally and it's a repo_id, handle download or direct HF loading.
         if model_path_to_load is None and is_repo_id:
             if auto_download == "enable":
-                print(
-                    f"OvisU1: Local model not found. Downloading from Hugging Face repo: {model_name}")
+                print(f"OvisU1: Local model not found. Downloading from Hugging Face repo: {model_name}")
                 model_path_to_load = self.download_model(model_name)
             else:
                 model_path_to_load = model_name
-                print(
-                    f"OvisU1: Will attempt to load from Hugging Face repo: {model_path_to_load}")
+                print(f"OvisU1: Will attempt to load from Hugging Face repo: {model_path_to_load}")
 
         if model_path_to_load is None:
-            raise FileNotFoundError(
-                f"Ovis-U1 model '{model_name}' not found in any of the 'unet' directories: {folder_paths.get_folder_paths('unet')}")
+            raise FileNotFoundError(f"Ovis-U1 model '{model_name}' not found in any of the 'unet' directories: {folder_paths.get_folder_paths('unet')}")
         try:
             load_kwargs = {
                 "torch_dtype": dtype,
@@ -238,23 +226,17 @@ class OvisU1VLModelLoader:
                 config_path = os.path.join(model_path_to_load, "config.json")
                 if os.path.exists(config_path):
                     import json
-                    with open(config_path, 'r', encoding='utf-8') as f:
+
+                    with open(config_path, "r", encoding="utf-8") as f:
                         config_data = json.load(f)
-                    if 'quantization_config' in config_data:
+                    if "quantization_config" in config_data:
                         has_quant_config = True
-                        print(
-                            "OvisU1: Detected pre-quantized model. Ignoring UI quantization setting.")
+                        print("OvisU1: Detected pre-quantized model. Ignoring UI quantization setting.")
 
             if not has_quant_config and quantization != "none":
-                print(
-                    f"OvisU1: Applying {quantization} quantization on-the-fly.")
+                print(f"OvisU1: Applying {quantization} quantization on-the-fly.")
                 if quantization == "4bit":
-                    quant_config = BitsAndBytesConfig(
-                        load_in_4bit=True,
-                        bnb_4bit_quant_type="nf4",
-                        bnb_4bit_use_double_quant=True,
-                        bnb_4bit_compute_dtype=dtype
-                    )
+                    quant_config = BitsAndBytesConfig(load_in_4bit=True, bnb_4bit_quant_type="nf4", bnb_4bit_use_double_quant=True, bnb_4bit_compute_dtype=dtype)
                 else:
                     quant_config = BitsAndBytesConfig(load_in_8bit=True)
                 load_kwargs["quantization_config"] = quant_config
@@ -263,12 +245,9 @@ class OvisU1VLModelLoader:
             print(f"OvisU1: Using device_map='{device_mapping}'")
             load_kwargs["device_map"] = device_mapping
 
-            model, loading_info = AutoModelForCausalLM.from_pretrained(
-                model_path_to_load,
-                **load_kwargs
-            )
+            model, loading_info = AutoModelForCausalLM.from_pretrained(model_path_to_load, **load_kwargs)
 
-            print(f'Loading info of Ovis-U1:\n{loading_info}')
+            print(f"Loading info of Ovis-U1:\n{loading_info}")
             self.model = model.eval()
             self.text_tokenizer = model.get_text_tokenizer()
             self.visual_tokenizer = model.get_visual_tokenizer()
@@ -278,6 +257,7 @@ class OvisU1VLModelLoader:
         except Exception as e:
             print(f"Error loading Ovis-U1 model: {str(e)}")
             import traceback
+
             traceback.print_exc()
             raise e
         finally:
@@ -298,7 +278,7 @@ class OvisU1ImageCaption:
                 "resize_image": ("BOOLEAN", {"default": True, "label_on": "Resize Enabled", "label_off": "Resize Disabled"}),
                 "prompt": ("STRING", {"default": "Describe this image in detail.", "multiline": True}),
                 "special_captioning_token": ("STRING", {"default": "", "multiline": False}),
-                "seed": ("INT", {"default": 69, "min": 1, "max": 0xffffffffffffffff}),
+                "seed": ("INT", {"default": 69, "min": 1, "max": 0xFFFFFFFFFFFFFFFF}),
                 "max_new_tokens": ("INT", {"default": 75, "min": 64, "max": 4096}),
                 "temperature": ("FLOAT", {"default": 0.7, "min": 0.0, "max": 1.0, "step": 0.1}),
                 "top_p": ("FLOAT", {"default": 0.9, "min": 0.1, "max": 1.0, "step": 0.01}),
@@ -322,24 +302,19 @@ class OvisU1ImageCaption:
         inference_device = comfy.model_management.get_torch_device()
         original_device = model.device
 
-        is_quantized = getattr(model, 'is_loaded_in_8bit', False) or getattr(
-            model, 'is_loaded_in_4bit', False)
+        is_quantized = getattr(model, "is_loaded_in_8bit", False) or getattr(model, "is_loaded_in_4bit", False)
 
-        if is_quantized and original_device.type == 'cpu':
-            raise RuntimeError(
-                "Quantized Ovis-U1 models (4/8-bit) cannot be moved after loading. "
-                "Please use the OvisU1ModelLoader with the 'device' set to 'cuda' to load it directly to VRAM."
-            )
+        if is_quantized and original_device.type == "cpu":
+            raise RuntimeError("Quantized Ovis-U1 models (4/8-bit) cannot be moved after loading. Please use the OvisU1ModelLoader with the 'device' set to 'cuda' to load it directly to VRAM.")
 
         # For non-quantized models, move to the inference device if it's on CPU
         # and a GPU is available.
-        model_on_cpu = original_device.type == 'cpu'
-        gpu_available = inference_device.type == 'cuda'
+        model_on_cpu = original_device.type == "cpu"
+        gpu_available = inference_device.type == "cuda"
 
         moved_to_gpu = False
         if model_on_cpu and gpu_available and not is_quantized:
-            print(
-                f"Ovis-U1 Caption: Moving model from {original_device} to {inference_device} for inference.")
+            print(f"Ovis-U1 Caption: Moving model from {original_device} to {inference_device} for inference.")
             model.to(inference_device)
             moved_to_gpu = True
 
@@ -356,39 +331,25 @@ class OvisU1ImageCaption:
 
             for i in range(batch_size):
                 pil_image = pil_images[i]
-                print(f"Ovis-U1 Caption: Processing image {i+1}/{batch_size}")
+                print(f"Ovis-U1 Caption: Processing image {i + 1}/{batch_size}")
                 try:
                     if resize_image:
-                        pil_image = resize_pil_image(
-                            pil_image, target_size=512, node_name="OvisU1ImageCaption")
+                        pil_image = resize_pil_image(pil_image, target_size=512, node_name="OvisU1ImageCaption")
 
                     query = f"<image>{prompt}"
 
                     # Preprocess inputs
-                    _, input_ids, pixel_values, grid_thws = model.preprocess_inputs(
-                        query,
-                        [pil_image],
-                        generation_preface='',
-                        return_labels=False,
-                        propagate_exception=False,
-                        multimodal_type='single_image',
-                        fix_sample_overall_length_navit=False
-                    )
-                    attention_mask = torch.ne(
-                        input_ids, text_tokenizer.pad_token_id)
+                    _, input_ids, pixel_values, grid_thws = model.preprocess_inputs(query, [pil_image], generation_preface="", return_labels=False, propagate_exception=False, multimodal_type="single_image", fix_sample_overall_length_navit=False)
+                    attention_mask = torch.ne(input_ids, text_tokenizer.pad_token_id)
 
                     # Move inputs to the correct device for inference
-                    input_ids = input_ids.unsqueeze(0).to(
-                        device=current_inference_device)
-                    attention_mask = attention_mask.unsqueeze(
-                        0).to(device=current_inference_device)
+                    input_ids = input_ids.unsqueeze(0).to(device=current_inference_device)
+                    attention_mask = attention_mask.unsqueeze(0).to(device=current_inference_device)
 
                     if pixel_values is not None:
-                        pixel_values = pixel_values.to(
-                            device=current_inference_device, dtype=dtype)
+                        pixel_values = pixel_values.to(device=current_inference_device, dtype=dtype)
                     if grid_thws is not None:
-                        grid_thws = grid_thws.to(
-                            device=current_inference_device)
+                        grid_thws = grid_thws.to(device=current_inference_device)
 
                     do_sample_bool = do_sample.lower() == "true"
 
@@ -404,26 +365,24 @@ class OvisU1ImageCaption:
 
                     # Use autocast for mixed-precision
                     with torch.inference_mode(), autocast(device_type=current_inference_device.type, dtype=dtype):
-                        output_ids = model.generate(input_ids, pixel_values=pixel_values,
-                                                    attention_mask=attention_mask, grid_thws=grid_thws, **gen_kwargs)[0]
-                        gen_text = text_tokenizer.decode(
-                            output_ids, skip_special_tokens=True)
+                        output_ids = model.generate(input_ids, pixel_values=pixel_values, attention_mask=attention_mask, grid_thws=grid_thws, **gen_kwargs)[0]
+                        gen_text = text_tokenizer.decode(output_ids, skip_special_tokens=True)
 
                     if special_captioning_token and special_captioning_token.strip():
                         gen_text = f"{special_captioning_token.strip()}, {gen_text}"
 
-                    gen_text = ' '.join(gen_text.split())
+                    gen_text = " ".join(gen_text.split())
                     captions.append(gen_text.strip().strip('"'))
                 except Exception as e:
                     print(f"Error generating caption for image {i}: {str(e)}")
                     import traceback
+
                     traceback.print_exc()
                     captions.append(f"Error generating caption: {str(e)}")
         finally:
             # Move model back to CPU if we moved it
             if moved_to_gpu:
-                print(
-                    f"Ovis-U1 Caption: Moving model back to {original_device}.")
+                print(f"Ovis-U1 Caption: Moving model back to {original_device}.")
                 model.to(original_device)
                 gc.collect()
                 if torch.cuda.is_available():

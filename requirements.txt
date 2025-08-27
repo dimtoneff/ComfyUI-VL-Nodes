@@ -1,7 +1,7 @@
 accelerate
 sentencepiece
 huggingface_hub
-transformers>=4.54.0
+transformers>=4.55.0
 qwen-vl-utils
 keye-vl-utils
 Pillow
@@ -9,4 +9,4 @@ numpy>=1.25.0,<2.0.0
 scipy>=1.11.3
 
 bitsandbytes
-flash-attn==2.7.4
+flash-attn>=2.7.4

@@ -1,35 +1,32 @@
-import time
-import os
 import gc
-import torch
+import os
+import time
+
+import numpy as np
 import requests
-from comfy.cli_args import args
+import torch
+from PIL import Image, ImageOps
+
 import comfy.model_management
 import comfy.utils
-from PIL import Image, ImageOps
-import numpy as np
-from .mimo_nodes import unload_all_mimo_models
-from .lfm2_nodes import unload_all_lfm2_hf_models
-from .ovisu1_nodes import unload_all_ovisu1_models
-from .ovis25_nodes import unload_all_ovis25_models
-from .keye_nodes import unload_all_keye_models
-from ..utils import any_type, sort_by
+from comfy.cli_args import args
 
-sort_methods = [
-    "None",
-    "Alphabetical (ASC)",
-    "Alphabetical (DESC)",
-    "Numerical (ASC)",
-    "Numerical (DESC)",
-    "Datetime (ASC)",
-    "Datetime (DESC)"
-]
+from ..utils import any_type, sort_by
+from .gguf_nodes import unload_all_gguf_models
+from .internvl35_nodes import unload_all_internvl_models
+from .keye_nodes import unload_all_keye_models
+from .lfm2_nodes import unload_all_lfm2_hf_models
+from .ovis25_nodes import unload_all_ovis25_models
+from .ovisu1_nodes import unload_all_ovisu1_models
+
+sort_methods = ["None", "Alphabetical (ASC)", "Alphabetical (DESC)", "Numerical (ASC)", "Numerical (DESC)", "Datetime (ASC)", "Datetime (DESC)"]
 
 
 class LoadImagesFromDirBatch_VL:
     """
     Load a batch of images from a directory. Inspired from InspirePack with some modifications.
     """
+
     @classmethod
     def INPUT_TYPES(s):
         return {
@@ -38,11 +35,11 @@ class LoadImagesFromDirBatch_VL:
             },
             "optional": {
                 "image_load_cap": ("INT", {"default": 0, "min": 0, "step": 1}),
-                "start_index": ("INT", {"default": 0, "min": -1, "max": 0xffffffffffffffff, "step": 1}),
+                "start_index": ("INT", {"default": 0, "min": -1, "max": 0xFFFFFFFFFFFFFFFF, "step": 1}),
                 "load_always": ("BOOLEAN", {"default": False, "label_on": "enabled", "label_off": "disabled"}),
                 "sort_method": (sort_methods,),
                 "filename_text_extension": (["true", "false"], {"default": "false"}),
-            }
+            },
         }
 
     RETURN_TYPES = ("IMAGE", "MASK", "INT", "STRING")
@@ -54,23 +51,21 @@ class LoadImagesFromDirBatch_VL:
 
     @classmethod
     def IS_CHANGED(cls, **kwargs):
-        if 'load_always' in kwargs and kwargs['load_always']:
+        if "load_always" in kwargs and kwargs["load_always"]:
             return float("NaN")
         else:
             return hash(frozenset(kwargs))
 
     def load_images(self, directory: str, image_load_cap: int = 0, start_index: int = 0, load_always=False, sort_method=None, filename_text_extension="false"):
         if not os.path.isdir(directory):
-            raise FileNotFoundError(
-                f"Directory '{directory} cannot be found.'")
+            raise FileNotFoundError(f"Directory '{directory} cannot be found.'")
         dir_files = os.listdir(directory)
         if len(dir_files) == 0:
             raise FileNotFoundError(f"No files in directory '{directory}'.")
 
         # Filter files by extension
-        valid_extensions = ['.jpg', '.jpeg', '.png', '.webp']
-        dir_files = [f for f in dir_files if any(
-            f.lower().endswith(ext) for ext in valid_extensions)]
+        valid_extensions = [".jpg", ".jpeg", ".png", ".webp"]
+        dir_files = [f for f in dir_files if any(f.lower().endswith(ext) for ext in valid_extensions)]
 
         dir_files = sort_by(dir_files, directory, sort_method)
         dir_files = [os.path.join(directory, x) for x in dir_files]
@@ -99,9 +94,9 @@ class LoadImagesFromDirBatch_VL:
             image = i.convert("RGB")
             image = np.array(image).astype(np.float32) / 255.0
             image = torch.from_numpy(image)[None,]
-            if 'A' in i.getbands():
-                mask = np.array(i.getchannel('A')).astype(np.float32) / 255.0
-                mask = 1. - torch.from_numpy(mask)
+            if "A" in i.getbands():
+                mask = np.array(i.getchannel("A")).astype(np.float32) / 255.0
+                mask = 1.0 - torch.from_numpy(mask)
                 has_non_empty_mask = True
             else:
                 mask = torch.zeros((64, 64), dtype=torch.float32, device="cpu")
@@ -127,15 +122,13 @@ class LoadImagesFromDirBatch_VL:
 
             for image2 in images[1:]:
                 if image1.shape[1:] != image2.shape[1:]:
-                    image2 = comfy.utils.common_upscale(
-                        image2.movedim(-1, 1), image1.shape[2], image1.shape[1], "bilinear", "center").movedim(1, -1)
+                    image2 = comfy.utils.common_upscale(image2.movedim(-1, 1), image1.shape[2], image1.shape[1], "bilinear", "center").movedim(1, -1)
                 image1 = torch.cat((image1, image2), dim=0)
 
             for mask2 in masks:
                 if has_non_empty_mask:
                     if image1.shape[1:3] != mask2.shape:
-                        mask2 = torch.nn.functional.interpolate(mask2.unsqueeze(0).unsqueeze(0), size=(
-                            image1.shape[1], image1.shape[2]), mode='bilinear', align_corners=False)
+                        mask2 = torch.nn.functional.interpolate(mask2.unsqueeze(0).unsqueeze(0), size=(image1.shape[1], image1.shape[2]), mode="bilinear", align_corners=False)
                         mask2 = mask2.squeeze(0)
                     else:
                         mask2 = mask2.unsqueeze(0)
@@ -154,6 +147,7 @@ class LoadImagesFromDirList_VL:
     """
     Load a batch of images from a directory. Inspired from InspirePack with some modifications.
     """
+
     @classmethod
     def INPUT_TYPES(s):
         return {
@@ -162,11 +156,11 @@ class LoadImagesFromDirList_VL:
             },
             "optional": {
                 "image_load_cap": ("INT", {"default": 0, "min": 0, "step": 1}),
-                "start_index": ("INT", {"default": 0, "min": 0, "max": 0xffffffffffffffff, "step": 1}),
+                "start_index": ("INT", {"default": 0, "min": 0, "max": 0xFFFFFFFFFFFFFFFF, "step": 1}),
                 "load_always": ("BOOLEAN", {"default": False, "label_on": "enabled", "label_off": "disabled"}),
                 "sort_method": (sort_methods,),
                 "filename_text_extension": (["true", "false"], {"default": "false"}),
-            }
+            },
         }
 
     RETURN_TYPES = ("IMAGE", "MASK", "STRING")
@@ -179,24 +173,22 @@ class LoadImagesFromDirList_VL:
 
     @classmethod
     def IS_CHANGED(cls, **kwargs):
-        if 'load_always' in kwargs and kwargs['load_always']:
+        if "load_always" in kwargs and kwargs["load_always"]:
             return float("NaN")
         else:
             return hash(frozenset(kwargs))
 
     def load_images(self, directory: str, image_load_cap: int = 0, start_index: int = 0, load_always=False, sort_method=None, filename_text_extension="false"):
         if not os.path.isdir(directory):
-            raise FileNotFoundError(
-                f"Directory '{directory}' cannot be found.'")
+            raise FileNotFoundError(f"Directory '{directory}' cannot be found.'")
         dir_files = os.listdir(directory)
         if len(dir_files) == 0:
             raise FileNotFoundError(f"No files in directory '{directory}'.")
 
         # Filter files by extension
-        valid_extensions = ['.jpg', '.jpeg', '.png', '.webp']
+        valid_extensions = [".jpg", ".jpeg", ".png", ".webp"]
 
-        dir_files = [f for f in dir_files if any(
-            f.lower().endswith(ext) for ext in valid_extensions)]
+        dir_files = [f for f in dir_files if any(f.lower().endswith(ext) for ext in valid_extensions)]
 
         dir_files = sort_by(dir_files, directory, sort_method)
         dir_files = [os.path.join(directory, x) for x in dir_files]
@@ -224,9 +216,9 @@ class LoadImagesFromDirList_VL:
             image = np.array(image).astype(np.float32) / 255.0
             image = torch.from_numpy(image)[None,]
 
-            if 'A' in i.getbands():
-                mask = np.array(i.getchannel('A')).astype(np.float32) / 255.0
-                mask = 1. - torch.from_numpy(mask)
+            if "A" in i.getbands():
+                mask = np.array(i.getchannel("A")).astype(np.float32) / 255.0
+                mask = 1.0 - torch.from_numpy(mask)
             else:
                 mask = torch.zeros((64, 64), dtype=torch.float32, device="cpu")
 
@@ -243,7 +235,7 @@ class LoadImagesFromDirList_VL:
         return (images, masks, file_paths)
 
 
-class MiMoFreeMemoryAPI:
+class VLNodesFreeMemoryAPI:
     def __init__(self):
         self.add_waiting = None
 
@@ -261,10 +253,13 @@ class MiMoFreeMemoryAPI:
     OUTPUT_NODE = True
 
     def unload_models(self):
-        print("MiMoUnloadModels: Clearing all models from memory.")
+        print("VLNodesFreeMemory: Clearing all models from memory.")
 
-        # Unload MiMo models first, as they have special handling
-        unload_all_mimo_models()
+        # Unload GGUF models first, as they have special handling
+        unload_all_gguf_models()
+
+        # Unload InternVL models
+        unload_all_internvl_models()
 
         # Unload LFM2 HF models
         unload_all_lfm2_hf_models()
@@ -305,8 +300,7 @@ class MiMoFreeMemoryAPI:
         payload = {"unload_models": True, "free_memory": True}
 
         try:
-            print(
-                f"FreeMemoryAPI: Calling ComfyUI API to free memory: {url}")
+            print(f"FreeMemoryAPI: Calling ComfyUI API to free memory: {url}")
             response = requests.post(url, json=payload)
             response.raise_for_status()
             print("FreeMemoryAPI: Successfully freed models and execution cache.")
@@ -319,13 +313,13 @@ class MiMoFreeMemoryAPI:
 
 
 NODE_CLASS_MAPPINGS = {
-    "MiMoFreeMemoryAPI": MiMoFreeMemoryAPI,
+    "VLNodesFreeMemoryAPI": VLNodesFreeMemoryAPI,
     "LoadImagesFromDirBatch_VL": LoadImagesFromDirBatch_VL,
     "LoadImagesFromDirList_VL": LoadImagesFromDirList_VL,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
-    "MiMoFreeMemoryAPI": "Free Memory (VL Nodes)",
+    "VLNodesFreeMemoryAPI": "Free Memory (VL Nodes)",
     "LoadImagesFromDirBatch_VL": "Load Images From Dir (Batch) [VL]",
     "LoadImagesFromDirList_VL": "Load Images From Dir (List) [VL]",
 }

@@ -1,0 +1,336 @@
+{
+  "id": "9e07843c-8f59-4563-8826-12739285ffca",
+  "revision": 0,
+  "last_node_id": 37,
+  "last_link_id": 65,
+  "nodes": [
+    {
+      "id": 12,
+      "type": "LoadImage",
+      "pos": [
+        136.4893035888672,
+        368.60675048828125
+      ],
+      "size": [
+        272.87799072265625,
+        326
+      ],
+      "flags": {
+        "collapsed": false
+      },
+      "order": 0,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            61
+          ]
+        },
+        {
+          "name": "MASK",
+          "type": "MASK",
+          "links": null
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.49",
+        "Node name for S&R": "LoadImage"
+      },
+      "widgets_values": [
+        "pexels-enesersahin-29529439.jpg",
+        "image"
+      ]
+    },
+    {
+      "id": 37,
+      "type": "InternVL3_5_ModelLoader",
+      "pos": [
+        139.21524047851562,
+        122.39617919921875
+      ],
+      "size": [
+        270,
+        178
+      ],
+      "flags": {},
+      "order": 1,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "internvl_model",
+          "type": "INTERNVL_MODEL",
+          "links": [
+            60
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfyui-vl-nodes",
+        "ver": "389fe97681de4045378f5acbe6ec52a2f58390eb",
+        "Node name for S&R": "InternVL3_5_ModelLoader"
+      },
+      "widgets_values": [
+        "OpenGVLab/InternVL3_5-2B",
+        "none",
+        "bfloat16",
+        "cuda",
+        "enable",
+        "enable"
+      ]
+    },
+    {
+      "id": 36,
+      "type": "InternVL3_5_ImageToText",
+      "pos": [
+        446.95367431640625,
+        28.03104019165039
+      ],
+      "size": [
+        314.1817932128906,
+        531.4545288085938
+      ],
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "internvl_model",
+          "type": "INTERNVL_MODEL",
+          "link": 60
+        },
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "link": 61
+        }
+      ],
+      "outputs": [
+        {
+          "name": "text",
+          "type": "STRING",
+          "links": [
+            64
+          ]
+        },
+        {
+          "name": "thinking",
+          "type": "STRING",
+          "links": [
+            63
+          ]
+        },
+        {
+          "name": "text_list",
+          "shape": 6,
+          "type": "STRING",
+          "links": null
+        },
+        {
+          "name": "thinking_list",
+          "shape": 6,
+          "type": "STRING",
+          "links": null
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfyui-vl-nodes",
+        "ver": "389fe97681de4045378f5acbe6ec52a2f58390eb",
+        "Node name for S&R": "InternVL3_5_ImageToText"
+      },
+      "widgets_values": [
+        "You are an AI assistant that rigorously follows this response protocol:\n\n1. First, conduct a detailed analysis of the question. Consider different angles, potential solutions, and reason through the problem step-by-step. Enclose this entire thinking process within <think> and  </think> tags.\n\n2. After the thinking section, provide a clear, concise, and direct answer to the user's question. Separate the answer from the think section with a newline.\n\nEnsure that the thinking process is thorough but remains focused on the query. The final answer should be standalone and not reference the thinking section.",
+        "You are an assistant who perfectly describes images. Fully describe the image as a prompt for Stable Diffusion text2image SDXL model. If you see nsfw stuff describe it too. Do not omit anything! Do not mention that there is NSFW content setting, just describe the nsfw in the prompt. !Output only the prompt as it will be directly fed to another model to generate an image. Be clear and use short sentences to describe the image! DO not use MD format, do not add titles or paragraphs!",
+        "",
+        420230304615828,
+        "randomize",
+        12,
+        1024,
+        true,
+        0.6,
+        0.95,
+        50
+      ]
+    },
+    {
+      "id": 13,
+      "type": "ShowText|pysssss",
+      "pos": [
+        785.4739379882812,
+        61.82172393798828
+      ],
+      "size": [
+        268.5708923339844,
+        163.90895080566406
+      ],
+      "flags": {},
+      "order": 5,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "text",
+          "type": "STRING",
+          "link": 65
+        }
+      ],
+      "outputs": [
+        {
+          "name": "STRING",
+          "shape": 6,
+          "type": "STRING",
+          "links": null
+        }
+      ],
+      "title": "PROMPT",
+      "properties": {
+        "cnr_id": "comfyui-custom-scripts",
+        "ver": "aac13aa7ce35b07d43633c3bbe654a38c00d74f5",
+        "Node name for S&R": "ShowText|pysssss"
+      },
+      "widgets_values": [
+        "Two silhouetted figures stand on rocky shore facing calm sea during golden sunset, mountains in background, boats with rowers in water reflecting orange glow, rippling water surface, distant small boats, warm sunset hues, serene coastal scene."
+      ]
+    },
+    {
+      "id": 35,
+      "type": "VLNodesFreeMemoryAPI",
+      "pos": [
+        787.4620361328125,
+        276.1509704589844
+      ],
+      "size": [
+        270,
+        58
+      ],
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "anything",
+          "type": "*",
+          "link": 64
+        }
+      ],
+      "outputs": [
+        {
+          "name": "output",
+          "type": "*",
+          "links": [
+            65
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfyui-vl-nodes",
+        "ver": "389fe97681de4045378f5acbe6ec52a2f58390eb",
+        "Node name for S&R": "VLNodesFreeMemoryAPI"
+      },
+      "widgets_values": [
+        false
+      ]
+    },
+    {
+      "id": 14,
+      "type": "ShowText|pysssss",
+      "pos": [
+        791.1631469726562,
+        386.32244873046875
+      ],
+      "size": [
+        461.3949279785156,
+        421.04730224609375
+      ],
+      "flags": {},
+      "order": 4,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "text",
+          "type": "STRING",
+          "link": 63
+        }
+      ],
+      "outputs": [
+        {
+          "name": "STRING",
+          "shape": 6,
+          "type": "STRING",
+          "links": null
+        }
+      ],
+      "title": "THINKING",
+      "properties": {
+        "cnr_id": "comfyui-custom-scripts",
+        "ver": "aac13aa7ce35b07d43633c3bbe654a38c00d74f5",
+        "Node name for S&R": "ShowText|pysssss"
+      },
+      "widgets_values": [
+        "Okay, let's see. The user wants me to generate a detailed prompt for Stable Diffusion based on the given image. The image shows two people standing on rocks by the water during sunset, with boats in the water and mountains in the background. The sky is golden, and the water reflects the sunset.\n\nFirst, I need to capture all elements: the two silhouetted figures on the rocks, the boats with people in them, the mountain range, the golden hour lighting, the water's surface, and the overall serene atmosphere. I should mention the sunset colors, the reflection on the water, and the presence of the boats and people. \n\nWait, the user specified to include NSFW content if present. But in this image, there's nothing explicit or NSFW. The people are just standing and looking out, no suggestive actions. So I don't need to mention NSFW here. Just focus on the scene elements.\n\nI need to make sure the prompt is clear, uses short sentences, and includes all details. Avoid any markdown. Let me structure it step by step:\n\n- Start with the main scene: two silhouetted people on rocks by the water.\n- Describe the setting: sunset, golden hour, mountains in the background.\n- Include the water with boats and people in them.\n- Mention the reflection of the sky on the water.\n- Add details like rocky shore, distant boats, and the overall mood.\n\nCheck if I missed anything. The boats are in the middle and right of the image, people rowing or standing. The mountains are dark against the golden sky. The water is rippling, reflecting the sunlight. The two people on the rocks are facing the water. \n\nYes, that's all covered. Now, phrase it concisely without using bullet points or titles. Use commas to separate elements. Make sure the colors and lighting are emphasized as golden and warm."
+      ]
+    }
+  ],
+  "links": [
+    [
+      60,
+      37,
+      0,
+      36,
+      0,
+      "INTERNVL_MODEL"
+    ],
+    [
+      61,
+      12,
+      0,
+      36,
+      1,
+      "IMAGE"
+    ],
+    [
+      63,
+      36,
+      1,
+      14,
+      0,
+      "STRING"
+    ],
+    [
+      64,
+      36,
+      0,
+      35,
+      0,
+      "*"
+    ],
+    [
+      65,
+      35,
+      0,
+      13,
+      0,
+      "STRING"
+    ]
+  ],
+  "groups": [],
+  "config": {},
+  "extra": {
+    "ds": {
+      "scale": 1.1,
+      "offset": [
+        138.36049812160974,
+        276.5590067384378
+      ]
+    },
+    "frontendVersion": "1.25.10",
+    "VHS_latentpreview": false,
+    "VHS_latentpreviewrate": 0,
+    "VHS_MetadataImage": true,
+    "VHS_KeepIntermediate": true
+  },
+  "version": 0.4
+}

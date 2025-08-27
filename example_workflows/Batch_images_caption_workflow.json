@@ -1,8 +1,8 @@
 {
   "id": "9e07843c-8f59-4563-8826-12739285ffca",
   "revision": 0,
-  "last_node_id": 74,
-  "last_link_id": 134,
+  "last_node_id": 75,
+  "last_link_id": 136,
   "nodes": [
     {
       "id": 62,
@@ -88,7 +88,7 @@
           "name": "text",
           "type": "STRING",
           "links": [
-            123
+            135
           ]
         },
         {
@@ -158,45 +158,6 @@
       ]
     },
     {
-      "id": 60,
-      "type": "MiMoFreeMemoryAPI",
-      "pos": [
-        -161.5699462890625,
-        -201.8411102294922
-      ],
-      "size": [
-        270,
-        58
-      ],
-      "flags": {},
-      "order": 5,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "anything",
-          "type": "*",
-          "link": 123
-        }
-      ],
-      "outputs": [
-        {
-          "name": "output",
-          "type": "*",
-          "links": [
-            102
-          ]
-        }
-      ],
-      "properties": {
-        "cnr_id": "comfyui-vl-nodes",
-        "ver": "6ab7af32e11476b93ee4c8f99488c3f648c838b0",
-        "Node name for S&R": "MiMoFreeMemoryAPI"
-      },
-      "widgets_values": [
-        false
-      ]
-    },
-    {
       "id": 41,
       "type": "ShowText|pysssss",
       "pos": [
@@ -214,7 +175,7 @@
         {
           "name": "text",
           "type": "STRING",
-          "link": 102
+          "link": 136
         }
       ],
       "outputs": [
@@ -414,17 +375,48 @@
         "file2",
         "file3"
       ]
+    },
+    {
+      "id": 75,
+      "type": "VLNodesFreeMemoryAPI",
+      "pos": [
+        -163.125244140625,
+        -200.58993530273438
+      ],
+      "size": [
+        270,
+        58
+      ],
+      "flags": {},
+      "order": 5,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "anything",
+          "type": "*",
+          "link": 135
+        }
+      ],
+      "outputs": [
+        {
+          "name": "output",
+          "type": "*",
+          "links": [
+            136
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfyui-vl-nodes",
+        "ver": "389fe97681de4045378f5acbe6ec52a2f58390eb",
+        "Node name for S&R": "VLNodesFreeMemoryAPI"
+      },
+      "widgets_values": [
+        false
+      ]
     }
   ],
   "links": [
-    [
-      102,
-      60,
-      0,
-      41,
-      0,
-      "STRING"
-    ],
     [
       121,
       57,
@@ -432,14 +424,6 @@
       71,
       0,
       "LFM2_HF_MODEL"
-    ],
-    [
-      123,
-      71,
-      0,
-      60,
-      0,
-      "*"
     ],
     [
       125,
@@ -494,6 +478,22 @@
       74,
       3,
       68,
+      0,
+      "STRING"
+    ],
+    [
+      135,
+      71,
+      0,
+      75,
+      0,
+      "*"
+    ],
+    [
+      136,
+      75,
+      0,
+      41,
       0,
       "STRING"
     ]
