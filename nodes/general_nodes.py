@@ -48,7 +48,7 @@ class TextSave_VL:
     OUTPUT_NODE = True
     RETURN_TYPES = ()
     FUNCTION = "save_text_file"
-    CATEGORY = "VL-Nodes/Batch"
+    CATEGORY = "VL-Nodes 👁️‍🗨️/Batch"
 
     def save_text_file(self, text, path, filename_prefix='ComfyUI', filename_delimiter='_', filename_number_padding=4, file_extension='.txt', encoding='utf-8', filename_suffix='', skip_overwrite=False):
         if not os.path.exists(path):
@@ -140,7 +140,7 @@ class LoadImagesFromDirBatch_VL:
     OUTPUT_IS_LIST = (False, False, False, True)
     FUNCTION = "load_images"
 
-    CATEGORY = "VL-Nodes/Batch"
+    CATEGORY = "VL-Nodes 👁️‍🗨️/Batch"
 
     @classmethod
     def IS_CHANGED(cls, **kwargs):
@@ -278,7 +278,7 @@ class LoadImagesFromDirList_VL:
 
     FUNCTION = "load_images"
 
-    CATEGORY = "VL-Nodes/Batch"
+    CATEGORY = "VL-Nodes 👁️‍🗨️/Batch"
 
     @classmethod
     def IS_CHANGED(cls, **kwargs):
@@ -371,7 +371,7 @@ class VLNodesFreeMemoryAPI:
     RETURN_TYPES = (any_type,)
     RETURN_NAMES = ("output",)
     FUNCTION = "free_memory"
-    CATEGORY = "VL-Nodes"
+    CATEGORY = "VL-Nodes 👁️‍🗨️"
     OUTPUT_NODE = True
 
     def unload_models(self):
@@ -442,8 +442,8 @@ NODE_CLASS_MAPPINGS = {
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
-    "VLNodesFreeMemoryAPI": "Free Memory (VL Nodes)",
-    "LoadImagesFromDirBatch_VL": "Load Images From Dir (Batch) [VL]",
-    "LoadImagesFromDirList_VL": "Load Images From Dir (List) [VL]",
-    "TextSave_VL": "Save Text Files [VL]",
+    "VLNodesFreeMemoryAPI": "👁️ Free Memory (VL Nodes)",
+    "LoadImagesFromDirBatch_VL": "👁️ Load Images From Dir (Batch) [VL]",
+    "LoadImagesFromDirList_VL": "👁️ Load Images From Dir (List) [VL]",
+    "TextSave_VL": "👁️ Save Text Files [VL]",
 }

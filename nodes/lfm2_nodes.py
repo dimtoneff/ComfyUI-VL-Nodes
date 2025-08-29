@@ -71,7 +71,7 @@ class LFM2TransformerModelLoader:
     RETURN_TYPES = ("LFM2_HF_MODEL",)
     RETURN_NAMES = ("lfm2_hf_model",)
     FUNCTION = "load_model"
-    CATEGORY = "VL-Nodes/LFM2-VL"
+    CATEGORY = "VL-Nodes 👁️‍🗨️/LFM2-VL"
 
     def unload(self):
         if self.model is None:
@@ -195,7 +195,7 @@ class LFM2TransformerImageToText:
     RETURN_NAMES = ("text", "text_list")
     OUTPUT_IS_LIST = (False, True)
     FUNCTION = "generate_text"
-    CATEGORY = "VL-Nodes/LFM2-VL"
+    CATEGORY = "VL-Nodes 👁️‍🗨️/LFM2-VL"
 
     def generate_text(self, lfm2_hf_model, image, prompt, special_captioning_token, seed, max_new_tokens, temperature, min_p, repetition_penalty):
         model = lfm2_hf_model["model"]
@@ -494,6 +494,6 @@ NODE_CLASS_MAPPINGS = {
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
-    "LFM2TransformerModelLoader": "Load LFM2-VL HF Model",
-    "LFM2TransformerImageToText": "LFM2-VL HF Image to Text",
+    "LFM2TransformerModelLoader": "👁️ Load LFM2-VL HF Model",
+    "LFM2TransformerImageToText": "👁️ LFM2-VL HF Image to Text",
 }

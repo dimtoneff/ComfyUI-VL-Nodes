@@ -67,7 +67,7 @@ class GGUF_VLM_ModelLoader:
     RETURN_TYPES = ("GGUF_MODEL",)
     RETURN_NAMES = ("gguf_model",)
     FUNCTION = "load_model"
-    CATEGORY = "VL-Nodes/GGUF"
+    CATEGORY = "VL-Nodes 👁️‍🗨️/GGUF"
 
     def unload(self):
         """Unloads the GGUF model and releases associated resources."""
@@ -213,7 +213,7 @@ class GGUF_VLM_ImageToText:
     RETURN_NAMES = ("text", "thinking", "text_list", "thinking_list")
     OUTPUT_IS_LIST = (False, False, True, True)
     FUNCTION = "generate_description"
-    CATEGORY = "VL-Nodes/GGUF"
+    CATEGORY = "VL-Nodes 👁️‍🗨️/GGUF"
 
     def generate_description(self, gguf_model, image, resize_image, enable_thinking, system_prompt, special_captioning_token, seed, prompt, max_tokens, temperature, top_k, top_p, min_p, repeat_penalty):
         pil_images = tensor2pil(image)
@@ -350,6 +350,6 @@ NODE_CLASS_MAPPINGS = {
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
-    "GGUF_VLM_ModelLoader": "Load GGUF VLM Model",
-    "GGUF_VLM_ImageToText": "GGUF VLM Image to Text",
+    "GGUF_VLM_ModelLoader": "👁️ Load GGUF VLM Model",
+    "GGUF_VLM_ImageToText": "👁️ GGUF VLM Image to Text",
 }

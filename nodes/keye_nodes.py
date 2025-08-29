@@ -84,7 +84,7 @@ class KeyeModelLoader:
     RETURN_TYPES = ("KEYE_MODEL",)
     RETURN_NAMES = ("keye_model",)
     FUNCTION = "load_model"
-    CATEGORY = "VL-Nodes/Keye-VL"
+    CATEGORY = "VL-Nodes 👁️‍🗨️/Keye-VL"
 
     def unload(self):
         """Unloads the Keye model and releases associated resources."""
@@ -326,7 +326,7 @@ class KeyeNode:
     RETURN_NAMES = ("text", "thinking", "text_list", "thinking_list")
     OUTPUT_IS_LIST = (False, False, True, True)
     FUNCTION = "generate_text"
-    CATEGORY = "VL-Nodes/Keye-VL"
+    CATEGORY = "VL-Nodes 👁️‍🗨️/Keye-VL"
 
     def generate_text(self, keye_model, image, prompt, special_captioning_token, thinking_mode, resolution_control, device, max_new_tokens, temperature, top_p, do_sample, seed, **kwargs):
         model_data = keye_model
@@ -539,6 +539,6 @@ NODE_CLASS_MAPPINGS = {
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
-    "KeyeModelLoader": "Load Keye-VL Model",
-    "KeyeNode": "Keye-VL Image to Text",
+    "KeyeModelLoader": "👁️ Load Keye-VL Model",
+    "KeyeNode": "👁️ Keye-VL Image to Text",
 }

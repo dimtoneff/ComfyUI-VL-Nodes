@@ -11,7 +11,7 @@ A key feature of this custom node set is the ability to caption a whole director
 * Input is a directory with a batch of images
 * The output is a batch of single .txt files with the same name as the image with the description in it, saved in the same directory as the images
 * You can add a special token as a prefix
-* You are going to need to install the `Save Text File` node from [was-node-suite-comfyu](https://github.com/WASasquatch/was-node-suite-comfyui)
+* From version >=0.9 the node can traverse all sub directories
 * **All the model nodes were updated to support batch image captioning**
 
 ### Nodes

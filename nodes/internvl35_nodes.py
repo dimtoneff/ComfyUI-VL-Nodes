@@ -145,7 +145,7 @@ class InternVL3_5_ModelLoader:
     RETURN_TYPES = ("INTERNVL_MODEL",)
     RETURN_NAMES = ("internvl_model",)
     FUNCTION = "load_model"
-    CATEGORY = "VL-Nodes/InternVL"
+    CATEGORY = "VL-Nodes 👁️‍🗨️/InternVL"
 
     def unload(self):
         if self.model is None:
@@ -285,7 +285,7 @@ class InternVL3_5_ImageToText:
     RETURN_NAMES = ("text", "thinking", "text_list", "thinking_list")
     OUTPUT_IS_LIST = (False, False, True, True)
     FUNCTION = "generate_text"
-    CATEGORY = "VL-Nodes/InternVL"
+    CATEGORY = "VL-Nodes 👁️‍🗨️/InternVL"
 
     def generate_text(self, internvl_model, image, system_prompt, prompt, special_captioning_token, seed, max_num_tiles, max_new_tokens, do_sample, temperature, top_p, top_k):
         model = internvl_model["model"]
@@ -366,6 +366,6 @@ NODE_CLASS_MAPPINGS = {
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
-    "InternVL3_5_ModelLoader": "Load InternVL3.5 Model",
-    "InternVL3_5_ImageToText": "InternVL3.5 Image to Text",
+    "InternVL3_5_ModelLoader": "👁️ Load InternVL3.5 Model",
+    "InternVL3_5_ImageToText": "👁️ InternVL3.5 Image to Text",
 }

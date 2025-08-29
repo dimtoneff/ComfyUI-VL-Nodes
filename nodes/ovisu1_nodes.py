@@ -70,7 +70,7 @@ class OvisU1VLModelLoader:
     RETURN_TYPES = ("OVIS_U1_MODEL",)
     RETURN_NAMES = ("model",)
     FUNCTION = "load_model"
-    CATEGORY = "VL-Nodes/Ovis-U1"
+    CATEGORY = "VL-Nodes 👁️‍🗨️/Ovis-U1"
 
     def unload(self):
         """Unloads the Ovis-U1 model and releases associated resources."""
@@ -290,7 +290,7 @@ class OvisU1ImageCaption:
     RETURN_NAMES = ("text", "text_list")
     OUTPUT_IS_LIST = (False, True)
     FUNCTION = "generate_caption"
-    CATEGORY = "VL-Nodes/Ovis-U1"
+    CATEGORY = "VL-Nodes 👁️‍🗨️/Ovis-U1"
 
     def generate_caption(self, model, image, resize_image, prompt, special_captioning_token, seed, max_new_tokens, temperature, top_p, do_sample):
         model_data = model
@@ -397,6 +397,6 @@ NODE_CLASS_MAPPINGS = {
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
-    "OvisU1VLModelLoader": "Load Ovis-U1 VL Model",
-    "OvisU1ImageCaption": "Ovis-U1 Image Caption",
+    "OvisU1VLModelLoader": "👁️ Load Ovis-U1 VL Model",
+    "OvisU1ImageCaption": "👁️ Ovis-U1 Image Caption",
 }

@@ -63,7 +63,7 @@ class Ovis25ModelLoader:
     RETURN_TYPES = ("OVIS25_MODEL",)
     RETURN_NAMES = ("ovis25_model",)
     FUNCTION = "load_model"
-    CATEGORY = "VL-Nodes/Ovis-2.5"
+    CATEGORY = "VL-Nodes 👁️‍🗨️/Ovis-2.5"
 
     def unload(self):
         """Unloads the Ovis-2.5 model and releases associated resources."""
@@ -196,7 +196,7 @@ class Ovis25ImageToText:
     RETURN_NAMES = ("text", "thinking", "text_list", "thinking_list")
     OUTPUT_IS_LIST = (False, False, True, True)
     FUNCTION = "generate_text"
-    CATEGORY = "VL-Nodes/Ovis-2.5"
+    CATEGORY = "VL-Nodes 👁️‍🗨️/Ovis-2.5"
 
     def generate_text(self, ovis25_model, image, prompt, special_captioning_token, seed, resize_image, enable_thinking, enable_thinking_budget, max_new_tokens, thinking_budget, temperature, top_p, do_sample):
         model_data = ovis25_model
@@ -312,6 +312,6 @@ NODE_CLASS_MAPPINGS = {
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
-    "Ovis25ModelLoader": "Load Ovis-2.5 Model",
-    "Ovis25ImageToText": "Ovis-2.5 Image to Text",
+    "Ovis25ModelLoader": "👁️ Load Ovis-2.5 Model",
+    "Ovis25ImageToText": "👁️ Ovis-2.5 Image to Text",
 }
