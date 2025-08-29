@@ -38,7 +38,7 @@ This project includes nodes for the following models:
   * **WARNING**: Kwai-Keye/Keye-VL-8B-Preview is a chunky model (17Gb+)
 * **InternVL3.5 transformers only**: Adds support for the InternVL3.5 model series (OpenGVLab/InternVL3_5-1B, OpenGVLab/InternVL3_5-2B, OpenGVLab/InternVL3_5-4B, OpenGVLab/InternVL3_5-8B, OpenGVLab/InternVL3_5-14B, OpenGVLab/InternVL3_5-38B).
   * **WARNING**: Larger models (14B, 38B) require significant VRAM
-* **General Utilities**: Includes a `Free Memory` node to help manage VRAM by unloading all loaded VL models.
+* **General Utilities**: Includes a `Free Memory` node to help manage VRAM by unloading all loaded VL models. Other nodes added there are modified versions from Inspire and was node bundles (`Load Images From Dir (Batch) [VL]`, `Load Images From Dir (List) [VL]`, `Save Text Files [VL]`)
 
 ## Installation
 
@@ -188,9 +188,10 @@ Once installed, you will find the nodes under the `GGUF`, `LFM2-VL`, `Ovis2.5`, 
 
 
 ### General Nodes
-*   **`Load Images/FileNames from Dir (Batch)(VL)`**: Loads a batch of images from a specified directory and outputs them as a single batch tensor. It also provides the file names for each image, allowing for automated saving of generated captions.
-*   **`Load Images/FileNames from Dir (List)(VL)`**: Similar to the batch version, but outputs images and file names as lists. This is useful for workflows that require iterating through images individually.
-*   **`Free Memory (VL Nodes)`** (Category: `VL-Nodes/Memory`): Unloads all loaded VL models to free up VRAM.
+*   **`Load Images/FileNames from Dir (Batch)(VL)`**: Loads a batch of images from a specified directory and outputs them as a single batch tensor. It also provides the file names for each image, allowing for automated saving of generated captions. Now includes an optional `traverse_subdirs` parameter to recursively scan subdirectories.
+*   **`Load Images/FileNames from Dir (List)(VL)`**: Similar to the batch version, but outputs images and file names as lists. This is useful for workflows that require iterating through images individually. Now includes an optional `traverse_subdirs` parameter to recursively scan subdirectories.
+*   **`Save Text Files [VL]`**: Custom text saving node with an optional `skip_overwrite` parameter to prevent overwriting existing files.
+*   **`Free Memory (VL Nodes)`**: Unloads all loaded VL models to free up VRAM. No memory leaks!
 
 ## Example Workflow
 

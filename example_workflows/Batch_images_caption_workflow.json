@@ -1,393 +1,23 @@
 {
   "id": "9e07843c-8f59-4563-8826-12739285ffca",
   "revision": 0,
-  "last_node_id": 75,
-  "last_link_id": 136,
+  "last_node_id": 78,
+  "last_link_id": 148,
   "nodes": [
-    {
-      "id": 62,
-      "type": "Save Text File",
-      "pos": [
-        -173.7353057861328,
-        253.33248901367188
-      ],
-      "size": [
-        306.1015625,
-        205.3057861328125
-      ],
-      "flags": {},
-      "order": 6,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "text",
-          "type": "STRING",
-          "link": 125
-        },
-        {
-          "name": "path",
-          "type": "STRING",
-          "widget": {
-            "name": "path"
-          },
-          "link": 128
-        },
-        {
-          "name": "filename_prefix",
-          "type": "STRING",
-          "widget": {
-            "name": "filename_prefix"
-          },
-          "link": 130
-        }
-      ],
-      "outputs": [],
-      "properties": {
-        "cnr_id": "was-node-suite-comfyui",
-        "ver": "1.0.2",
-        "Node name for S&R": "Save Text File"
-      },
-      "widgets_values": [
-        "J:\\SD\\lora\\workspace\\test",
-        "ComfyUI",
-        "",
-        0,
-        ".txt",
-        "utf-8",
-        ""
-      ]
-    },
-    {
-      "id": 71,
-      "type": "LFM2TransformerImageToText",
-      "pos": [
-        -180.77685546875,
-        -86.23793029785156
-      ],
-      "size": [
-        319.33880615234375,
-        276
-      ],
-      "flags": {},
-      "order": 3,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "lfm2_hf_model",
-          "type": "LFM2_HF_MODEL",
-          "link": 121
-        },
-        {
-          "name": "image",
-          "type": "IMAGE",
-          "link": 131
-        }
-      ],
-      "outputs": [
-        {
-          "name": "text",
-          "type": "STRING",
-          "links": [
-            135
-          ]
-        },
-        {
-          "name": "text_list",
-          "shape": 6,
-          "type": "STRING",
-          "links": [
-            125,
-            126
-          ]
-        }
-      ],
-      "properties": {
-        "cnr_id": "comfyui-vl-nodes",
-        "ver": "1744cefa4de7463aa23edb0b2b94889498b1ef85",
-        "Node name for S&R": "LFM2TransformerImageToText"
-      },
-      "widgets_values": [
-        "Describe this image. The description will be used as caption text for model training. Describe everything in detail but do not overdo it!",
-        "ohwx woman",
-        665191007306985,
-        "randomize",
-        512,
-        0.1,
-        0.15,
-        1.05
-      ]
-    },
-    {
-      "id": 70,
-      "type": "ShowText|pysssss",
-      "pos": [
-        162.23162841796875,
-        -217.0147247314453
-      ],
-      "size": [
-        326.0363464355469,
-        499.1570739746094
-      ],
-      "flags": {},
-      "order": 7,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "text",
-          "type": "STRING",
-          "link": 126
-        }
-      ],
-      "outputs": [
-        {
-          "name": "STRING",
-          "shape": 6,
-          "type": "STRING",
-          "links": null
-        }
-      ],
-      "properties": {
-        "cnr_id": "comfyui-custom-scripts",
-        "ver": "f2838ed5e59de4d73cde5c98354b87a8d3200190",
-        "Node name for S&R": "ShowText|pysssss"
-      },
-      "widgets_values": [
-        "ohwx woman, This image features a young woman seated on a tennis court, leaning against a black and white tennis net. She has long, wavy brown hair and is wearing a blue halter top paired with white shorts. Her outfit is complemented by white sneakers. The woman's pose is relaxed yet poised, with her legs crossed and one hand resting on her knee while the other hand is placed on her thigh. She's looking off to the side with a contemplative expression, her gaze directed at something outside the frame. The tennis court surface beneath her is gray, and the net stretches across the background. The lighting suggests it's daytime, with sunlight casting soft shadows around her. Overall, the image captures a moment of quiet introspection in an athletic setting, highlighting the subject's style and the environment of the tennis court.",
-        "ohwx woman, This beach scene captures a young woman enjoying a sunny day by the ocean. She's seated on a large gray rock, her body angled slightly to the left while her head is turned towards the camera, giving us a clear view of her face and upper body. The woman has long, dark brown hair that falls just past her shoulders. Her makeup is subtle, with pink lipstick enhancing her features. She's wearing a white tank top with a pink and orange striped pattern, which adds a vibrant touch to her appearance. Her pose is relaxed and casual, with one hand resting on her knee and the other lightly touching the rock. This posture suggests she's comfortable in her surroundings and at ease with the beach environment. The backdrop is equally captivating. The ocean stretches out behind her, its blue waters dotted with small waves breaking gently on the shore. The sky above is clear and bright, indicating perfect weather conditions. In the distance, you can see a city skyline, with tall buildings silhouetted against the horizon. This juxtaposition of natural beauty and urban landscape creates an interesting contrast in the background. The overall composition of the image is well-balanced, with the woman's figure occupying the foreground and the expansive ocean and sky providing a serene and picturesque setting. The combination of these elements creates a visually appealing and relaxing beach scene that showcases the beauty of nature and human presence.",
-        "ohwx woman, The image depicts a young woman standing on a tennis court, wearing a blue sports bra and white skirt. She has long brown hair with bangs and is looking off to the side with a slight smile. The background shows a tennis court with a net and a fence, and some trees and buildings can be seen in the distance. The woman appears to be modeling, possibly for a fashion or lifestyle campaign."
-      ]
-    },
-    {
-      "id": 41,
-      "type": "ShowText|pysssss",
-      "pos": [
-        168.3648223876953,
-        342.05389404296875
-      ],
-      "size": [
-        320.23797607421875,
-        378.4298095703125
-      ],
-      "flags": {},
-      "order": 8,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "text",
-          "type": "STRING",
-          "link": 136
-        }
-      ],
-      "outputs": [
-        {
-          "name": "STRING",
-          "shape": 6,
-          "type": "STRING",
-          "links": null
-        }
-      ],
-      "properties": {
-        "cnr_id": "comfyui-custom-scripts",
-        "ver": "aac13aa7ce35b07d43633c3bbe654a38c00d74f5",
-        "Node name for S&R": "ShowText|pysssss"
-      },
-      "widgets_values": [
-        "ohwx woman, This image features a young woman seated on a tennis court, leaning against a black and white tennis net. She has long, wavy brown hair and is wearing a blue halter top paired with white shorts. Her outfit is complemented by white sneakers. The woman's pose is relaxed yet poised, with her legs crossed and one hand resting on her knee while the other hand is placed on her thigh. She's looking off to the side with a contemplative expression, her gaze directed at something outside the frame. The tennis court surface beneath her is gray, and the net stretches across the background. The lighting suggests it's daytime, with sunlight casting soft shadows around her. Overall, the image captures a moment of quiet introspection in an athletic setting, highlighting the subject's style and the environment of the tennis court.\n\n=============================\n\nohwx woman, This beach scene captures a young woman enjoying a sunny day by the ocean. She's seated on a large gray rock, her body angled slightly to the left while her head is turned towards the camera, giving us a clear view of her face and upper body. The woman has long, dark brown hair that falls just past her shoulders. Her makeup is subtle, with pink lipstick enhancing her features. She's wearing a white tank top with a pink and orange striped pattern, which adds a vibrant touch to her appearance. Her pose is relaxed and casual, with one hand resting on her knee and the other lightly touching the rock. This posture suggests she's comfortable in her surroundings and at ease with the beach environment. The backdrop is equally captivating. The ocean stretches out behind her, its blue waters dotted with small waves breaking gently on the shore. The sky above is clear and bright, indicating perfect weather conditions. In the distance, you can see a city skyline, with tall buildings silhouetted against the horizon. This juxtaposition of natural beauty and urban landscape creates an interesting contrast in the background. The overall composition of the image is well-balanced, with the woman's figure occupying the foreground and the expansive ocean and sky providing a serene and picturesque setting. The combination of these elements creates a visually appealing and relaxing beach scene that showcases the beauty of nature and human presence.\n\n=============================\n\nohwx woman, The image depicts a young woman standing on a tennis court, wearing a blue sports bra and white skirt. She has long brown hair with bangs and is looking off to the side with a slight smile. The background shows a tennis court with a net and a fence, and some trees and buildings can be seen in the distance. The woman appears to be modeling, possibly for a fashion or lifestyle campaign."
-      ]
-    },
-    {
-      "id": 72,
-      "type": "PrimitiveString",
-      "pos": [
-        -524.7255859375,
-        -6.990142822265625
-      ],
-      "size": [
-        293.4859313964844,
-        58
-      ],
-      "flags": {},
-      "order": 0,
-      "mode": 0,
-      "inputs": [],
-      "outputs": [
-        {
-          "name": "STRING",
-          "type": "STRING",
-          "links": [
-            128,
-            133
-          ]
-        }
-      ],
-      "title": "DIRECTORY WITH FILES TO CAPTION",
-      "properties": {
-        "cnr_id": "comfy-core",
-        "ver": "0.3.52",
-        "Node name for S&R": "PrimitiveString"
-      },
-      "widgets_values": [
-        "J:\\SD\\lora\\workspace\\test"
-      ],
-      "color": "#322",
-      "bgcolor": "#533"
-    },
-    {
-      "id": 74,
-      "type": "LoadImagesFromDirBatch_VL",
-      "pos": [
-        -520.7257080078125,
-        125.01007080078125
-      ],
-      "size": [
-        284.9751892089844,
-        246.79998779296875
-      ],
-      "flags": {},
-      "order": 2,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "directory",
-          "type": "STRING",
-          "widget": {
-            "name": "directory"
-          },
-          "link": 133
-        }
-      ],
-      "outputs": [
-        {
-          "name": "IMAGE",
-          "type": "IMAGE",
-          "links": [
-            131
-          ]
-        },
-        {
-          "name": "MASK",
-          "type": "MASK",
-          "links": null
-        },
-        {
-          "name": "COUNT",
-          "type": "INT",
-          "links": null
-        },
-        {
-          "name": "FILE_NAME",
-          "shape": 6,
-          "type": "STRING",
-          "links": [
-            130,
-            134
-          ]
-        }
-      ],
-      "properties": {
-        "cnr_id": "comfyui-vl-nodes",
-        "ver": "6c9feba487d25ed36c635311712035f3341b1c76",
-        "Node name for S&R": "LoadImagesFromDirBatch_VL"
-      },
-      "widgets_values": [
-        "",
-        0,
-        0,
-        true,
-        "Alphabetical (ASC)",
-        "false"
-      ]
-    },
-    {
-      "id": 57,
-      "type": "LFM2TransformerModelLoader",
-      "pos": [
-        -524.1685791015625,
-        -214.9320526123047
-      ],
-      "size": [
-        270,
-        154
-      ],
-      "flags": {},
-      "order": 1,
-      "mode": 0,
-      "inputs": [],
-      "outputs": [
-        {
-          "name": "lfm2_hf_model",
-          "type": "LFM2_HF_MODEL",
-          "links": [
-            121
-          ]
-        }
-      ],
-      "properties": {
-        "cnr_id": "comfyui-vl-nodes",
-        "ver": "8e0e876a96488dabe86f09d3696364ef74d1b52e",
-        "Node name for S&R": "LFM2TransformerModelLoader",
-        "aux_id": "dimtoneff/ComfyUI-VL-Nodes"
-      },
-      "widgets_values": [
-        "LiquidAI/LFM2-VL-450M",
-        "none",
-        "bfloat16",
-        "cuda",
-        "enable"
-      ]
-    },
-    {
-      "id": 68,
-      "type": "ShowText|pysssss",
-      "pos": [
-        -514.20458984375,
-        440.5389709472656
-      ],
-      "size": [
-        270.2479248046875,
-        176.00003051757812
-      ],
-      "flags": {},
-      "order": 4,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "text",
-          "type": "STRING",
-          "link": 134
-        }
-      ],
-      "outputs": [
-        {
-          "name": "STRING",
-          "shape": 6,
-          "type": "STRING",
-          "links": null
-        }
-      ],
-      "properties": {
-        "cnr_id": "comfyui-custom-scripts",
-        "ver": "f2838ed5e59de4d73cde5c98354b87a8d3200190",
-        "Node name for S&R": "ShowText|pysssss"
-      },
-      "widgets_values": [
-        "file1",
-        "file2",
-        "file3"
-      ]
-    },
     {
       "id": 75,
       "type": "VLNodesFreeMemoryAPI",
       "pos": [
-        -163.125244140625,
-        -200.58993530273438
+        -130,
+        -190
       ],
       "size": [
         270,
         58
       ],
-      "flags": {},
+      "flags": {
+        "collapsed": true
+      },
       "order": 5,
       "mode": 0,
       "inputs": [
@@ -414,6 +44,380 @@
       "widgets_values": [
         false
       ]
+    },
+    {
+      "id": 68,
+      "type": "ShowText|pysssss",
+      "pos": [
+        -510,
+        420
+      ],
+      "size": [
+        270,
+        290
+      ],
+      "flags": {},
+      "order": 4,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "text",
+          "type": "STRING",
+          "link": 148
+        }
+      ],
+      "outputs": [
+        {
+          "name": "STRING",
+          "shape": 6,
+          "type": "STRING",
+          "links": null
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfyui-custom-scripts",
+        "ver": "f2838ed5e59de4d73cde5c98354b87a8d3200190",
+        "Node name for S&R": "ShowText|pysssss"
+      },
+      "widgets_values": [
+        "J:\\SD\\lora\\workspace\\test\\file1",
+        "J:\\SD\\lora\\workspace\\test\\test1\\file2",
+        "J:\\SD\\lora\\workspace\\test\\test1\\test2\\file3"
+      ]
+    },
+    {
+      "id": 77,
+      "type": "TextSave_VL",
+      "pos": [
+        -180,
+        200
+      ],
+      "size": [
+        306.1015625,
+        226
+      ],
+      "flags": {},
+      "order": 7,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "text",
+          "type": "STRING",
+          "link": 140
+        },
+        {
+          "name": "path",
+          "type": "STRING",
+          "widget": {
+            "name": "path"
+          },
+          "link": 147
+        },
+        {
+          "name": "filename_prefix",
+          "type": "STRING",
+          "widget": {
+            "name": "filename_prefix"
+          },
+          "link": 146
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "cnr_id": "comfyui-vl-nodes",
+        "ver": "63a96c5447791ed4db75dae27fb97577bbe34185",
+        "Node name for S&R": "TextSave_VL"
+      },
+      "widgets_values": [
+        "./ComfyUI/output/[time(%Y-%m-%d)]",
+        "ComfyUI",
+        "",
+        0,
+        ".txt",
+        "utf-8",
+        "",
+        true
+      ]
+    },
+    {
+      "id": 41,
+      "type": "ShowText|pysssss",
+      "pos": [
+        160,
+        320
+      ],
+      "size": [
+        330,
+        390
+      ],
+      "flags": {},
+      "order": 8,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "text",
+          "type": "STRING",
+          "link": 136
+        }
+      ],
+      "outputs": [
+        {
+          "name": "STRING",
+          "shape": 6,
+          "type": "STRING",
+          "links": null
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfyui-custom-scripts",
+        "ver": "aac13aa7ce35b07d43633c3bbe654a38c00d74f5",
+        "Node name for S&R": "ShowText|pysssss"
+      },
+      "widgets_values": [
+        "ohwx woman, A young woman with long red hair sits on a tennis court, wearing a blue halter top and white shorts. She's wearing white sneakers and has her hands on her knees. The photo is taken from a low angle, looking up at her. The background shows a tennis net and part of the court. The image is clear and well-lit, with natural sunlight casting shadows on the ground. The woman appears relaxed and confident.\n\n=============================\n\nohwx woman, A young woman with long brown hair sits on a rocky beach, wearing a white and pink striped bikini top and pink bikini bottom. She's smiling at the camera while looking up at the sky. The ocean waves crash against the rocks behind her, creating a beautiful contrast between the blue water and the sandy shore. The scene captures a relaxed, summery atmosphere with the woman enjoying the natural beauty of the beach.\n\n=============================\n\nohwx woman, A young woman with long brown hair wearing a blue sports bra and white tennis skirt stands on a tennis court. She has a serious expression and is looking off to the side. The background shows a tennis net and a fence. The image is in color and appears to be a professional photograph."
+      ]
+    },
+    {
+      "id": 70,
+      "type": "ShowText|pysssss",
+      "pos": [
+        160,
+        -220
+      ],
+      "size": [
+        330,
+        490
+      ],
+      "flags": {},
+      "order": 6,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "text",
+          "type": "STRING",
+          "link": 126
+        }
+      ],
+      "outputs": [
+        {
+          "name": "STRING",
+          "shape": 6,
+          "type": "STRING",
+          "links": null
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfyui-custom-scripts",
+        "ver": "f2838ed5e59de4d73cde5c98354b87a8d3200190",
+        "Node name for S&R": "ShowText|pysssss"
+      },
+      "widgets_values": [
+        "ohwx woman, A young woman with long red hair sits on a tennis court, wearing a blue halter top and white shorts. She's wearing white sneakers and has her hands on her knees. The photo is taken from a low angle, looking up at her. The background shows a tennis net and part of the court. The image is clear and well-lit, with natural sunlight casting shadows on the ground. The woman appears relaxed and confident.",
+        "ohwx woman, A young woman with long brown hair sits on a rocky beach, wearing a white and pink striped bikini top and pink bikini bottom. She's smiling at the camera while looking up at the sky. The ocean waves crash against the rocks behind her, creating a beautiful contrast between the blue water and the sandy shore. The scene captures a relaxed, summery atmosphere with the woman enjoying the natural beauty of the beach.",
+        "ohwx woman, A young woman with long brown hair wearing a blue sports bra and white tennis skirt stands on a tennis court. She has a serious expression and is looking off to the side. The background shows a tennis net and a fence. The image is in color and appears to be a professional photograph."
+      ]
+    },
+    {
+      "id": 57,
+      "type": "LFM2TransformerModelLoader",
+      "pos": [
+        -510,
+        -110
+      ],
+      "size": [
+        270,
+        154
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "lfm2_hf_model",
+          "type": "LFM2_HF_MODEL",
+          "links": [
+            121
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfyui-vl-nodes",
+        "ver": "8e0e876a96488dabe86f09d3696364ef74d1b52e",
+        "Node name for S&R": "LFM2TransformerModelLoader",
+        "aux_id": "dimtoneff/ComfyUI-VL-Nodes"
+      },
+      "widgets_values": [
+        "LiquidAI/LFM2-VL-450M",
+        "none",
+        "bfloat16",
+        "cuda",
+        "enable"
+      ]
+    },
+    {
+      "id": 72,
+      "type": "PrimitiveString",
+      "pos": [
+        -520,
+        -220
+      ],
+      "size": [
+        293.4859313964844,
+        58
+      ],
+      "flags": {},
+      "order": 1,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "links": [
+            143,
+            147
+          ]
+        }
+      ],
+      "title": "DIRECTORY WITH FILES TO CAPTION",
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.52",
+        "Node name for S&R": "PrimitiveString"
+      },
+      "widgets_values": [
+        "J:\\SD\\lora\\workspace\\test"
+      ],
+      "color": "#322",
+      "bgcolor": "#533"
+    },
+    {
+      "id": 71,
+      "type": "LFM2TransformerImageToText",
+      "pos": [
+        -200,
+        -130
+      ],
+      "size": [
+        340,
+        280
+      ],
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "lfm2_hf_model",
+          "type": "LFM2_HF_MODEL",
+          "link": 121
+        },
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "link": 144
+        }
+      ],
+      "outputs": [
+        {
+          "name": "text",
+          "type": "STRING",
+          "links": [
+            135
+          ]
+        },
+        {
+          "name": "text_list",
+          "shape": 6,
+          "type": "STRING",
+          "links": [
+            126,
+            140
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfyui-vl-nodes",
+        "ver": "1744cefa4de7463aa23edb0b2b94889498b1ef85",
+        "Node name for S&R": "LFM2TransformerImageToText"
+      },
+      "widgets_values": [
+        "You are an assistant who perfectly describes images. Fully describe the image as a prompt for Stable Diffusion text2image SDXL model. If you see nsfw stuff describe it too. Do not omit anything! Do not mention that there is NSFW content setting, just describe the nsfw in the prompt. !Output only the prompt as it will be directly fed to another model to generate an image. Be clear and use short sentences to describe the image!",
+        "ohwx woman",
+        554225580680317,
+        "randomize",
+        512,
+        0.1,
+        0.15,
+        1.05
+      ]
+    },
+    {
+      "id": 78,
+      "type": "LoadImagesFromDirBatch_VL",
+      "pos": [
+        -510,
+        100
+      ],
+      "size": [
+        270,
+        262
+      ],
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "directory",
+          "type": "STRING",
+          "widget": {
+            "name": "directory"
+          },
+          "link": 143
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            144
+          ]
+        },
+        {
+          "name": "MASK",
+          "type": "MASK",
+          "links": null
+        },
+        {
+          "name": "COUNT",
+          "type": "INT",
+          "links": null
+        },
+        {
+          "name": "FILE_NAME",
+          "shape": 6,
+          "type": "STRING",
+          "links": [
+            146,
+            148
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfyui-vl-nodes",
+        "ver": "63a96c5447791ed4db75dae27fb97577bbe34185",
+        "Node name for S&R": "LoadImagesFromDirBatch_VL"
+      },
+      "widgets_values": [
+        "",
+        0,
+        0,
+        true,
+        "Alphabetical (DESC)",
+        "false",
+        true
+      ]
     }
   ],
   "links": [
@@ -426,58 +430,10 @@
       "LFM2_HF_MODEL"
     ],
     [
-      125,
-      71,
-      1,
-      62,
-      0,
-      "STRING"
-    ],
-    [
       126,
       71,
       1,
       70,
-      0,
-      "STRING"
-    ],
-    [
-      128,
-      72,
-      0,
-      62,
-      1,
-      "STRING"
-    ],
-    [
-      130,
-      74,
-      3,
-      62,
-      2,
-      "STRING"
-    ],
-    [
-      131,
-      74,
-      0,
-      71,
-      1,
-      "IMAGE"
-    ],
-    [
-      133,
-      72,
-      0,
-      74,
-      0,
-      "STRING"
-    ],
-    [
-      134,
-      74,
-      3,
-      68,
       0,
       "STRING"
     ],
@@ -496,6 +452,54 @@
       41,
       0,
       "STRING"
+    ],
+    [
+      140,
+      71,
+      1,
+      77,
+      0,
+      "STRING"
+    ],
+    [
+      143,
+      72,
+      0,
+      78,
+      0,
+      "STRING"
+    ],
+    [
+      144,
+      78,
+      0,
+      71,
+      1,
+      "IMAGE"
+    ],
+    [
+      146,
+      78,
+      3,
+      77,
+      2,
+      "STRING"
+    ],
+    [
+      147,
+      72,
+      0,
+      77,
+      1,
+      "STRING"
+    ],
+    [
+      148,
+      78,
+      3,
+      68,
+      0,
+      "STRING"
     ]
   ],
   "groups": [],
@@ -504,11 +508,11 @@
     "ds": {
       "scale": 1,
       "offset": [
-        783.9253110949753,
-        429.58999466312315
+        681.5252866809128,
+        515.9898207129279
       ]
     },
-    "frontendVersion": "1.25.10",
+    "frontendVersion": "1.25.11",
     "VHS_latentpreview": false,
     "VHS_latentpreviewrate": 0,
     "VHS_MetadataImage": true,
